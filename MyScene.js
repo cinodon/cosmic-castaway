@@ -62,7 +62,7 @@ class MyScene extends THREE.Scene {
     //this.model = new MyPirate(this.gui, "Control del cristal", '../imgs/rusty-metal.jpg');
     //this.add (this.model);
 
-    this.cube = new MyBox(this.gui, "Control del cubo");
+    this.cube = new MyBoxHelix(this.gui, "Control del cubo");
     this.add (this.cube);
 
 
