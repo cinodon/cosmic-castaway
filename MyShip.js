@@ -1,14 +1,56 @@
-import * as THREE from '../libs/three.module.js'
+import * as THREE from '../libs/three.module.js' 
 import { CSG } from '../libs/CSG-v2.js' 
+import * as TWEEN from '../libs/tween.esm.js' 
 
 class MyShip extends THREE.Object3D {
-  constructor(gui,titleGui) {
+  constructor(gui,titleGui, tube) {
     super();
     
     // Se crea la parte de la interfaz que corresponde a la caja
     // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
     this.createGUI(gui,titleGui);
     
+    //Tubo
+      //Puntos
+      var l = 100;
+      var points = [
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(0, 0, l),
+        new THREE.Vector3(-l/2, -l/2, 3*l/4),
+        new THREE.Vector3(l/2, -l/2, l/4),
+        new THREE.Vector3(0, l/2, 0),
+        new THREE.Vector3(-l/2, l/2, l/4),
+        new THREE.Vector3(l/2, l/2, 3*l/4),
+        new THREE.Vector3(l/2, l/2, 3*l/4),
+        new THREE.Vector3(0, -l/2, l),
+        new THREE.Vector3(l, -l/2, l),
+        new THREE.Vector3(l, -l/2, l/2),
+        new THREE.Vector3(0, l/2, l/2),
+        new THREE.Vector3(-l/2, l, 0),
+
+    ];
+
+    this.spline = new THREE.CatmullRomCurve3( [ 
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0, 0, l),
+      new THREE.Vector3(l, 0, l),
+      new THREE.Vector3(l, 0, 0),
+      ], true );
+
+    var geometriaLinea = new THREE.BufferGeometry();
+    geometriaLinea.setFromPoints( this.spline.getPoints(100) );
+    var material = new THREE.LineBasicMaterial( { color: 0x0F0F0F, linewidth: 5} ); 
+    this.recorrido = new THREE.Line(geometriaLinea, material);
+
+    
+    /*this.segmentos = 200;
+    this.binormales = this.spline.computeFrenetFrames(this.segmentos, true).binormals;
+    var origen = {t : 0};
+    var fin = {t : 1};
+    var tTotal = 10000; //10 Segundos*/
+    
+    
+
 
     //Material
     var textureLoader = new THREE.TextureLoader();
@@ -18,10 +60,34 @@ class MyShip extends THREE.Object3D {
     this.mat.needsUpdate = true;
 
     // Ya podemos construir el Mesh
-    var mesh = this.createShip();
-
+    this.mesh = this.createShip();
     // Y añadirlo como hijo del Object3D (el this)
-    this.add (mesh);
+    this.add (this.mesh, this.recorrido);
+
+    //Animacion
+    var origen = {p:0};
+    var destino = {p : 1};
+  
+    var posicion = this.spline.getPoint(origen.p);
+    this.mesh.position.copy(posicion);
+    var tangente = this.spline.getTangentAt(origen.p); //Orientamos el obj 
+    posicion.add(tangente); 
+    this.mesh.lookAt(posicion); 
+    this.binormales = this.spline.computeFrenetFrames(100 , true ).binormals ;
+   
+    var movimiento = new TWEEN.Tween(origen).to(destino, 10000) //10s 
+    .onUpdate(()=>{ 
+      posicion = this.spline.getPoint(origen.p); //Modificar la pos a la nueva de origen 
+      this.mesh.position.copy(posicion); 
+      var tangente = this.spline.getTangentAt(origen.p); //Orientamos el obj 
+      posicion.add(tangente); 
+      this.mesh.up = this.binormales[Math.floor(origen.p * 100)]
+      this.mesh.lookAt(posicion);
+      //this.mesh.rotateX(Math.PI/2); 
+      //this.auricular.rotation.x += 0.01; 
+    })
+    .start() 
+    .repeat(Infinity)
     
   }
   
@@ -32,17 +98,22 @@ class MyShip extends THREE.Object3D {
     //Trozos
     //Parte de atrás
     var back = this.createBack();
+    back.rotateY(Math.PI);
+    back.position.z = -2;
+    
+
 
     //Asiento
     var seat = this.createSeat();
+    seat.rotateY(Math.PI);
 
     //Parte frontal
     var front = this.createFront();
+    front.rotateY(Math.PI);
 
 
     //Transformaciones
-    back.position.z = 2;
-
+    //back.position.z = 2;
     ship.add(back, front, seat);
     return ship;
   }
@@ -392,6 +463,10 @@ class MyShip extends THREE.Object3D {
     this.position.set (this.guiControls.posX,this.guiControls.posY,this.guiControls.posZ);
     this.rotation.set (this.guiControls.rotX,this.guiControls.rotY,this.guiControls.rotZ);
     this.scale.set (this.guiControls.sizeX,this.guiControls.sizeY,this.guiControls.sizeZ);
+    TWEEN.update();
+
+    
+
   }
 }
 

@@ -48,8 +48,9 @@ class MyScene extends THREE.Scene {
     // Tendremos una cámara con un control de movimiento con el ratón
     this.createCamera ();
     
-    // Un suelo 
-    //this.createGround ();
+    // Crear tubo
+    this.tube = this.createGround();
+    //this.add(this.tube);
     
     // Y unos ejes. Imprescindibles para orientarnos sobre dónde están las cosas
     // Todas las unidades están en metros
@@ -63,7 +64,7 @@ class MyScene extends THREE.Scene {
     //this.model = new MyPirate(this.gui, "Control del cristal", '../imgs/rusty-metal.jpg');
     //this.add (this.model);
 
-    this.cube = new MyPrueba(this.gui, "Control del cubo");
+    this.ship = new MyShip(this.gui, "Control del cubo", this.tube);
     this.add (this.cube);
 
 
@@ -92,7 +93,7 @@ class MyScene extends THREE.Scene {
     //   El ángulo del campo de visión en grados sexagesimales
     //   La razón de aspecto ancho/alto
     //   Los planos de recorte cercano y lejano
-    this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 50);
+    this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 500);
     // Recuerda: Todas las unidades están en metros
     // También se indica dónde se coloca
     this.camera.position.set (4, 2, 4);
@@ -112,24 +113,51 @@ class MyScene extends THREE.Scene {
   }
   
   createGround () {
-    // El suelo es un Mesh, necesita una geometría y un material.
-    
-    // La geometría es una caja con muy poca altura
-    var geometryGround = new THREE.BoxGeometry (10,0.2,10);
-    
-    // El material se hará con una textura de madera
-    var texture = new THREE.TextureLoader().load('../imgs/wood.jpg');
-    var materialGround = new THREE.MeshStandardMaterial ({map: texture});
-    
-    // Ya se puede construir el Mesh
-    var ground = new THREE.Mesh (geometryGround, materialGround);
-    
-    // Todas las figuras se crean centradas en el origen.
-    // El suelo lo bajamos la mitad de su altura para que el origen del mundo se quede en su lado superior
-    ground.position.y = -0.1;
-    
-    // Que no se nos olvide añadirlo a la escena, que en este caso es  this
-    this.add (ground);
+    //Puntos
+    var l = 100;
+    var points = [
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0, 0, l),
+      new THREE.Vector3(-l/2, -l/2, 3*l/4),
+      new THREE.Vector3(l/2, -l/2, l/4),
+      new THREE.Vector3(0, l/2, 0),
+      new THREE.Vector3(-l/2, l/2, l/4),
+      new THREE.Vector3(l/2, l/2, 3*l/4),
+      new THREE.Vector3(l/2, l/2, 3*l/4),
+      new THREE.Vector3(0, -l/2, l),
+      new THREE.Vector3(l, -l/2, l),
+      new THREE.Vector3(l, -l/2, l/2),
+      new THREE.Vector3(0, l/2, l/2),
+      new THREE.Vector3(-l/2, l, 0),
+
+  ];
+
+  //Curva
+  var path = new THREE.CatmullRomCurve3(points, true);
+
+  // El material se hará con una textura de cráteres
+  var materialGround = new THREE.MeshStandardMaterial({
+    transparent: true, // Hace que el material sea transparente
+    opacity: 0.5, // Ajusta la opacidad del material
+    color: 0xffffff, // Color del material (blanco)
+    metalness: 0.1, // Ajusta el nivel de metalización
+    roughness: 0.1, // Ajusta la rugosidad de la superficie
+    transmission: 0.9, // Ajusta la transmisión de luz a través del material (cristalino)
+    transparent: true, // Hace que el material sea transparente
+    opacity: 0.7 // Ajusta la opacidad del material (0 es completamente transparente, 1 es completamente opaco)
+});
+  
+  //Propiedades del tubo
+  var tubularSegments = 200;
+  var radius = 5;
+  var rSegments = 30;
+
+
+  // Crear el tubo usando TubeGeometry
+  var tubeGeometry = new THREE.TubeGeometry(path, tubularSegments, radius, rSegments, true);
+  var tubeMesh = new THREE.Mesh(tubeGeometry, materialGround);
+
+  return tubeMesh;
   }
   
   createGUI () {
@@ -249,7 +277,7 @@ class MyScene extends THREE.Scene {
     this.cameraControl.update();
     
     // Se actualiza el resto del modelo
-    this.cube.update();
+    this.ship.update();
 
     
     // Le decimos al renderizador "visualiza la escena que te indico usando la cámara que te estoy pasando"
