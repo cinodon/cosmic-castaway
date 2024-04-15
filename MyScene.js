@@ -65,7 +65,7 @@ class MyScene extends THREE.Scene {
     //this.add (this.model);
 
     this.ship = new MyShip(this.gui, "Control del cubo", this.tube);
-    this.add (this.cube);
+    this.add (this.ship);
 
 
     /*this.backship = new MyBackship(this.gui, "Controles del culo");
