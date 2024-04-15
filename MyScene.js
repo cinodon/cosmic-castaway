@@ -19,6 +19,7 @@ import { MyPirate } from './MyPirate.js'
 import { MyLaserCannon } from './MyLaserCannon.js'
 import { MyTripleLaser } from './MyTripleLaser.js'
 import { MyMegaRocket } from './MyMegaRocket.js'
+import { MyPrueba } from './MyPrueba.js'
 
 
 /// La clase fachada del modelo
@@ -62,7 +63,7 @@ class MyScene extends THREE.Scene {
     //this.model = new MyPirate(this.gui, "Control del cristal", '../imgs/rusty-metal.jpg');
     //this.add (this.model);
 
-    this.cube = new MyBoxHelix(this.gui, "Control del cubo");
+    this.cube = new MyPrueba(this.gui, "Control del cubo");
     this.add (this.cube);
 
 
