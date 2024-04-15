@@ -26,13 +26,17 @@ class MyPrueba extends THREE.Object3D {
     var box = new THREE.Object3D();
     
     //Crear caja base
-    var cube_geom = new THREE.BoxGeometry(1, 1, 1);
-    var sphere_geom = new THREE.SphereGeometry(0.8);
+    var cube_geom = new THREE.CylinderGeometry(0.5, 0.5, 0.5, 6);
+    var cils_geom = new THREE.CylinderGeometry(0.25, 0.25, 1);
+    var sphere_geom = new THREE.SphereGeometry(0.525);
     var csg = new CSG();
     var cubeM = new THREE.Mesh(cube_geom, this.mat);
+    var cilM = new THREE.Mesh(cils_geom, this.mat);
     var sphM = new THREE.Mesh(sphere_geom, this.mat);
     csg.intersect([cubeM, sphM]);
+    csg.subtract([cilM]);
     var m = csg.toMesh();
+    m.scale.set(1, 0.5, 1);
     box.add(m);
     return box;
   }
