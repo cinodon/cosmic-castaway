@@ -15,8 +15,7 @@ class MyPirate extends MyShip {
 
     // Ya podemos construir el Mesh
     var mesh = this.createPirate();
-    mesh.position.y = 0.3;
-    mesh.position.z = 0.93;
+
     // Y añadirlo como hijo del Object3D (el this)
     this.add (mesh);
     
@@ -56,7 +55,8 @@ class MyPirate extends MyShip {
 
     pirate.add(head, body, armR, armL, legR, legL);
     pirate.scale.set(0.8, 0.8, 0.8);
-    pirate.rotation.set(0, Math.PI, 0);
+    pirate.position.y = 0.3;
+    pirate.position.z = -1;
     return pirate;
 
   }

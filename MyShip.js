@@ -62,13 +62,13 @@ class MyShip extends THREE.Object3D {
     // Ya podemos construir el Mesh
     this.mesh = this.createShip();
     // Y añadirlo como hijo del Object3D (el this)
-    this.add (this.mesh, this.recorrido);
+    this.add (this.mesh);
 
     //Animacion
     var origen = {p:0};
     var destino = {p : 1};
   
-    var posicion = this.spline.getPoint(origen.p);
+    /*var posicion = this.spline.getPoint(origen.p);
     this.mesh.position.copy(posicion);
     var tangente = this.spline.getTangentAt(origen.p); //Orientamos el obj 
     posicion.add(tangente); 
@@ -88,7 +88,7 @@ class MyShip extends THREE.Object3D {
     })
     .start() 
     .repeat(Infinity)
-    .onComplete(() => {origen.p = 0;})
+    .onComplete(() => {origen.p = 0;})*/
     //Añadir on complete --> que cuando complete una vuelta aumente la velocidad y por tanto se reduzca el tiempo
     
   }
@@ -102,19 +102,19 @@ class MyShip extends THREE.Object3D {
     var back = this.createBack();
     back.rotateY(Math.PI);
     back.position.z = -2;
-    back.position.y = 3;
+    //back.position.y = 3;
     
 
 
     //Asiento
     var seat = this.createSeat();
     seat.rotateY(Math.PI);
-    seat.position.y = 3;
+    //seat.position.y = 3;
 
     //Parte frontal
     var front = this.createFront();
     front.rotateY(Math.PI);
-    front.position.y = 3;
+    //front.position.y = 3;
 
 
     //Transformaciones
@@ -482,8 +482,8 @@ class MyShip extends THREE.Object3D {
     this.position.set (this.guiControls.posX,this.guiControls.posY,this.guiControls.posZ);
     //this.rotation.set (this.guiControls.rotX,this.guiControls.rotY,this.guiControls.rotZ);
     this.scale.set (this.guiControls.sizeX,this.guiControls.sizeY,this.guiControls.sizeZ);
-    this.mesh.rotation.x += 0.01;
-    TWEEN.update();
+    //this.mesh.rotation.x += 0.01;
+    //TWEEN.update();
 
     
 

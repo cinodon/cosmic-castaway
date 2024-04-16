@@ -35,7 +35,7 @@ class MyRock extends THREE.Object3D {
       texture = textureLoader.load('../imgs/stone-texture.jpg');
       textSettings = {
         transparent: false, // Hacer el material transparente
-        opacity: 0.5, // Nivel de transparencia (0 = completamente transparente, 1 = completamente opaco)
+        opacity: 1, // Nivel de transparencia (0 = completamente transparente, 1 = completamente opaco)
         roughness: 1, // Rugosidad del cristal (0 = completamente liso, 1 = muy rugoso)
         metalness: 0.1, // Metalidad del cristal (0 = no metálico, 1 = completamente metálico)
         transmission: 0, // Transmitancia del material (0 = totalmente opaco, 1 = totalmente transparente)
@@ -43,7 +43,7 @@ class MyRock extends THREE.Object3D {
       }    
     } 
 
-    this.mat = new THREE.MeshBasicMaterial(textSettings);
+    this.mat = new THREE.MeshStandardMaterial(textSettings);
     var mesh = this.createRock();
     var max = 1.5;
     var min = 0.6;

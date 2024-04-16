@@ -50,7 +50,7 @@ class MyScene extends THREE.Scene {
     
     // Crear tubo
     this.tube = this.createGround();
-    //this.add(this.tube);
+    this.add(this.tube);
     
     // Y unos ejes. Imprescindibles para orientarnos sobre dónde están las cosas
     // Todas las unidades están en metros
@@ -64,12 +64,43 @@ class MyScene extends THREE.Scene {
     //this.model = new MyPirate(this.gui, "Control del cristal", '../imgs/rusty-metal.jpg');
     //this.add (this.model);
 
-    this.ship = new MyShip(this.gui, "Control del cubo", this.tube);
+    //Nave
+    this.ship = new MyShip(this.gui, "Control de la nave", this.tube);
     this.add (this.ship);
 
+    //Armas
+    this.weapon0 = new MyLaserCannon(this.gui, "Control del Cañon Láser");
+    this.add (this.weapon0);
 
-    /*this.backship = new MyBackship(this.gui, "Controles del culo");
-    this.add (this.backship);*/
+    this.weapon1 = new MyTripleLaser(this.gui, "Control del Rayo Triple");
+    this.add (this.weapon1);
+
+    this.weapon2 = new MyMegaRocket(this.gui, "Control del Mega Cañón");
+    this.add (this.weapon2);
+
+    //Pirata
+    this.pirate = new MyPirate(this.gui, "Control de la nave pirata");
+    this.add (this.pirate);
+
+    //Piedra
+    this.rock = new MyRock(this.gui, "Control de la roca", false);
+    this.add (this.rock);
+
+    //Mena de cristales
+    this.crystalrock = new MyRock(this.gui, "Control de la mena de cristales", true);
+    this.add (this.crystalrock);
+
+    //Cristal
+    this.crystal = new MyCrystal(this.gui, "Control del cristal");
+    this.add (this.crystal);
+
+    //Cajas
+    this.box = new MyBox(this.gui, "Control de la caja");
+    this.add (this.box);
+
+    this.boxh = new MyBoxHelix(this.gui, "Control de la caja con hélice");
+    this.add (this.boxh);
+ 
   }
   
   initStats() {
@@ -115,28 +146,22 @@ class MyScene extends THREE.Scene {
   createGround () {
     //Puntos
     var l = 100;
+    var y = 10;
     var points = [
-      new THREE.Vector3(0, 0, 0),
-      new THREE.Vector3(0, 0, l),
-      new THREE.Vector3(-l/2, -l/2, 3*l/4),
-      new THREE.Vector3(l/2, -l/2, l/4),
-      new THREE.Vector3(0, l/2, 0),
-      new THREE.Vector3(-l/2, l/2, l/4),
-      new THREE.Vector3(l/2, l/2, 3*l/4),
-      new THREE.Vector3(l/2, l/2, 3*l/4),
-      new THREE.Vector3(0, -l/2, l),
-      new THREE.Vector3(l, -l/2, l),
-      new THREE.Vector3(l, -l/2, l/2),
-      new THREE.Vector3(0, l/2, l/2),
-      new THREE.Vector3(-l/2, l, 0),
-
+      new THREE.Vector3(0, y, 0),
+      new THREE.Vector3(l, y, 0),
+      new THREE.Vector3(l, l+y, 0),
+      new THREE.Vector3(l, l+y, l),
+      new THREE.Vector3(0, l+y, l),
+      new THREE.Vector3(0, y, l),
   ];
 
   //Curva
   var path = new THREE.CatmullRomCurve3(points, true);
 
   // El material se hará con una textura de cráteres
-  var materialGround = new THREE.MeshStandardMaterial({
+  var materialGround = new THREE.MeshBasicMaterial({color: 0x444444})
+  /*var materialGround = new THREE.MeshStandardMaterial({
     transparent: true, // Hace que el material sea transparente
     opacity: 0.5, // Ajusta la opacidad del material
     color: 0xffffff, // Color del material (blanco)
@@ -145,11 +170,11 @@ class MyScene extends THREE.Scene {
     transmission: 0.9, // Ajusta la transmisión de luz a través del material (cristalino)
     transparent: true, // Hace que el material sea transparente
     opacity: 0.7 // Ajusta la opacidad del material (0 es completamente transparente, 1 es completamente opaco)
-});
+});*/
   
   //Propiedades del tubo
   var tubularSegments = 200;
-  var radius = 5;
+  var radius = 3;
   var rSegments = 30;
 
 
@@ -277,7 +302,32 @@ class MyScene extends THREE.Scene {
     this.cameraControl.update();
     
     // Se actualiza el resto del modelo
+    //Nave
     this.ship.update();
+    this.pirate.update();
+    this.pirate.position.set(5, 0, 0)
+    
+    //Minerales
+    this.rock.update();
+    this.rock.position.set(-2, 0, 5);
+    this.crystalrock.update();
+    this.crystalrock.position.set(0, 0, 5);
+    this.crystal.update();
+    this.crystal.position.set(1, 0, 5);
+    
+    //Armas
+    this.weapon0.update();
+    this.weapon0.position.set(-4, 0, 0);
+    this.weapon1.update();
+    this.weapon1.position.set(-4, 0, -1.3);
+    this.weapon2.update();
+    this.weapon2.position.set(-4, 0, -2);
+
+    //Boxes
+    this.box.update();
+    this.box.position.set(2, 0, 5);
+    this.boxh.update();
+    this.boxh.position.set(4, 0, 5);
 
     
     // Le decimos al renderizador "visualiza la escena que te indico usando la cámara que te estoy pasando"
