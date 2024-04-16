@@ -74,7 +74,7 @@ class MyShip extends THREE.Object3D {
     posicion.add(tangente); 
     this.mesh.lookAt(posicion); 
     this.binormales = this.spline.computeFrenetFrames(100 , true ).binormals ;
-   
+     
     var movimiento = new TWEEN.Tween(origen).to(destino, 10000) //10s 
     .onUpdate(()=>{ 
       posicion = this.spline.getPoint(origen.p); //Modificar la pos a la nueva de origen 
@@ -88,6 +88,8 @@ class MyShip extends THREE.Object3D {
     })
     .start() 
     .repeat(Infinity)
+    .onComplete(() => {origen.p = 0;})
+    //Añadir on complete --> que cuando complete una vuelta aumente la velocidad y por tanto se reduzca el tiempo
     
   }
   
