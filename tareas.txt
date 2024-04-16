@@ -2,3 +2,6 @@
 - Cámara
 - Interacción por teclado --> listeners, eventos y métodos de rotación de la nave
 - Definir UserData en cada objeto
+- Colisiones con cajas englobantes --> diapositiva 26 de Colisiones
+- Idea para colocar y cambiar las armas --> poner en la posición las tres armas directamente
+    - Poner con el atributo visible --> únicamente el arma equipada
