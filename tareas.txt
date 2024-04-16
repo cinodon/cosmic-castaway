@@ -1,0 +1,4 @@
+- Ajustar de nuevo el grafo de la nave para añadir los nodos de transformación -> rotación y traslación
+- Cámara
+- Interacción por teclado --> listeners, eventos y métodos de rotación de la nave
+- Definir UserData en cada objeto
