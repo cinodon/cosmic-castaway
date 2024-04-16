@@ -419,6 +419,8 @@ class MyShip extends THREE.Object3D {
       posX : 0.0,
       posY : 0.0,
       posZ : 0.0,
+
+      visible : true,
       
       // Un botón para dejarlo todo en su posición inicial
       // Cuando se pulse se ejecutará esta función.
@@ -434,6 +436,8 @@ class MyShip extends THREE.Object3D {
         this.guiControls.posX = 0.0;
         this.guiControls.posY = 0.0;
         this.guiControls.posZ = 0.0;
+
+        this.guiControls.visible = true;
       }
     } 
     
@@ -453,10 +457,20 @@ class MyShip extends THREE.Object3D {
     folder.add (this.guiControls, 'posX', -20.0, 20.0, 0.01).name ('Posición X : ').listen();
     folder.add (this.guiControls, 'posY', 0.0, 10.0, 0.01).name ('Posición Y : ').listen();
     folder.add (this.guiControls, 'posZ', -20.0, 20.0, 0.01).name ('Posición Z : ').listen();
+
+    // Y otro para mostrar u ocultar los ejes
+    folder.add (this.guiControls, 'visible')
+    .name ('Mostrar modelo : ')
+    .onChange ( (value) => this.setShipVisible (value) );
     
     folder.add (this.guiControls, 'reset').name ('[ Reset ]');
   }
   
+  setShipVisible(value)
+  {
+    this.mesh.visible = value;
+  }
+
   update () {
     // Con independencia de cómo se escriban las 3 siguientes líneas, el orden en el que se aplican las transformaciones es:
     // Primero, el escalado
