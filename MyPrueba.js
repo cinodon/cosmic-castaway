@@ -32,8 +32,10 @@ class MyPrueba extends THREE.Object3D {
     
     this.brazo2.position.x = this.brazo1.position.x + 0.5; 
     
-    var cono = new THREE.ConeGeometry(0.05, 0.25);
-    this.lamp
+    var cono = new THREE.ConeGeometry(0.15, 0.25);
+    this.lamp = new THREE.Mesh(cono, this.mat);
+    this.lamp.position.x = .5;
+    
     
     this.brazo2.add(this.lamp);
     this.brazo1.add(this.brazo2);
@@ -82,7 +84,7 @@ class MyPrueba extends THREE.Object3D {
     // El método   listen()   permite que si se cambia el valor de la variable en código, el deslizador de la interfaz se actualice
     folder.add (this.guiControls, 'rotB1', 0, Math.PI/2, 0.01).name ('Rot1 : ').listen();
     folder.add (this.guiControls, 'rotB2', -Math.PI/2, 0, -0.01).name ('Rot2: ').listen();
-    folder.add (this.guiControls, 'rotB3', 0, Math.PI/2, 0.01).name ('Rot3 : ').listen();
+    folder.add (this.guiControls, 'rotB3', -Math.PI/4, Math.PI/4, 0.01).name ('Rot3 : ').listen();
     
     folder.add (this.guiControls, 'rotX', 0.0, Math.PI*2, 0.01).name ('Rotación X : ').listen();
     folder.add (this.guiControls, 'rotY', 0.0, Math.PI*2, 0.01).name ('Rotación Y : ').listen();
@@ -107,6 +109,7 @@ class MyPrueba extends THREE.Object3D {
     this.rotation.set (this.guiControls.rotX,this.guiControls.rotY,this.guiControls.rotZ);
     this.brazo1.rotation.z = this.guiControls.rotB1;
     this.brazo2.rotation.z = this.guiControls.rotB2;
+    this.lamp.rotation.z = this.guiControls.rotB3;
     
 
   }
