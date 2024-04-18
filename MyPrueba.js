@@ -16,37 +16,39 @@ class MyPrueba extends THREE.Object3D {
     this.mat.needsUpdate = true;
     this.mat.side = THREE.DoubleSide;
 
-    var mesh = this.createBox(); //;this.createBox();
+    //Base
+    var cilG = new THREE.CylinderGeometry(0.2, .2, 0.05);
+    cilG.translate(0.1, 0.025, 0);
+    var base = new THREE.Mesh(cilG, this.mat);
 
-    this.add(mesh)
+    var brazoG = new THREE.BoxGeometry(.5, .05, .05);
+    brazoG.translate(0.225, 0, 0);
+    
+    this.brazo1 = new THREE.Mesh(brazoG, this.mat);
+    this.brazo1.position.y = .05/2 + 0.05;
+    this.brazo1.rotation.z = this.guiControls.rotB1;
+    
+    this.brazo2 = new THREE.Mesh(brazoG, this.mat);
+    
+    this.brazo2.position.x = this.brazo1.position.x + 0.5; 
+    
+    var cono = new THREE.ConeGeometry(0.05, 0.25);
+    this.lamp
+    
+    this.brazo2.add(this.lamp);
+    this.brazo1.add(this.brazo2);
+
+    this.add(base,  this.brazo1);
   }
   
-  createBox()
-  {
-    var box = new THREE.Object3D();
-    
-    //Crear caja base
-    var cube_geom = new THREE.CylinderGeometry(0.5, 0.5, 0.5, 6);
-    var cils_geom = new THREE.CylinderGeometry(0.25, 0.25, 1);
-    var sphere_geom = new THREE.SphereGeometry(0.525);
-    var csg = new CSG();
-    var cubeM = new THREE.Mesh(cube_geom, this.mat);
-    var cilM = new THREE.Mesh(cils_geom, this.mat);
-    var sphM = new THREE.Mesh(sphere_geom, this.mat);
-    csg.intersect([cubeM, sphM]);
-    csg.subtract([cilM]);
-    var m = csg.toMesh();
-    m.scale.set(1, 0.5, 1);
-    box.add(m);
-    return box;
-  }
+  
 
   createGUI (gui,titleGui) {
     // Controles para el tamaño, la orientación y la posición de la caja
     this.guiControls = {
-      sizeX : 1.0,
-      sizeY : 1.0,
-      sizeZ : 1.0,
+      rotB1: 0.0,
+      rotB2: 0.0,
+      rotB3: 0.0,
       
       rotX : 0.0,
       rotY : 0.0,
@@ -59,9 +61,9 @@ class MyPrueba extends THREE.Object3D {
       // Un botón para dejarlo todo en su posición inicial
       // Cuando se pulse se ejecutará esta función.
       reset : () => {
-        this.guiControls.sizeX = 1.0;
-        this.guiControls.sizeY = 1.0;
-        this.guiControls.sizeZ = 1.0;
+        this.guiControls.rotB1 = 0.0;
+        this.guiControls.rotB2 = 0.0;
+        this.guiControls.rotB3 = 0.0;
         
         this.guiControls.rotX = 0.0;
         this.guiControls.rotY = 0.0;
@@ -78,9 +80,9 @@ class MyPrueba extends THREE.Object3D {
     // Estas lineas son las que añaden los componentes de la interfaz
     // Las tres cifras indican un valor mínimo, un máximo y el incremento
     // El método   listen()   permite que si se cambia el valor de la variable en código, el deslizador de la interfaz se actualice
-    folder.add (this.guiControls, 'sizeX', 0.1, 5.0, 0.01).name ('Tamaño X : ').listen();
-    folder.add (this.guiControls, 'sizeY', 0.1, 5.0, 0.01).name ('Tamaño Y : ').listen();
-    folder.add (this.guiControls, 'sizeZ', 0.1, 5.0, 0.01).name ('Tamaño Z : ').listen();
+    folder.add (this.guiControls, 'rotB1', 0, Math.PI/2, 0.01).name ('Rot1 : ').listen();
+    folder.add (this.guiControls, 'rotB2', -Math.PI/2, 0, -0.01).name ('Rot2: ').listen();
+    folder.add (this.guiControls, 'rotB3', 0, Math.PI/2, 0.01).name ('Rot3 : ').listen();
     
     folder.add (this.guiControls, 'rotX', 0.0, Math.PI*2, 0.01).name ('Rotación X : ').listen();
     folder.add (this.guiControls, 'rotY', 0.0, Math.PI*2, 0.01).name ('Rotación Y : ').listen();
@@ -103,7 +105,10 @@ class MyPrueba extends THREE.Object3D {
    
     this.position.set (this.guiControls.posX,this.guiControls.posY,this.guiControls.posZ);
     this.rotation.set (this.guiControls.rotX,this.guiControls.rotY,this.guiControls.rotZ);
-    this.scale.set (this.guiControls.sizeX,this.guiControls.sizeY,this.guiControls.sizeZ);
+    this.brazo1.rotation.z = this.guiControls.rotB1;
+    this.brazo2.rotation.z = this.guiControls.rotB2;
+    
+
   }
 }
 
