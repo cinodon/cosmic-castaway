@@ -19,7 +19,7 @@ import { MyPirate } from './MyPirate.js'
 import { MyLaserCannon } from './MyLaserCannon.js'
 import { MyTripleLaser } from './MyTripleLaser.js'
 import { MyMegaRocket } from './MyMegaRocket.js'
-import { MyR2D2 } from './MyR2D2.js'
+import { MyGrua } from './MyGrua.js'
 
 
 
@@ -66,7 +66,7 @@ class MyScene extends THREE.Scene {
     //this.add (this.model);
 
     //Nave
-    this.ship = new MyR2D2(this.gui, "Control del modelo");
+    this.ship = new MyGrua(this.gui, "Control del modelo");
     this.add (this.ship);
   }
   
