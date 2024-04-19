@@ -65,7 +65,7 @@ class MyScene extends THREE.Scene {
     //this.add (this.model);
 
     //Nave
-    this.ship = new MyShip(this.gui, "Control de la nave", this.tube);
+    this.ship = new MyShip(this.gui, "Control de la nave", this.tube.geometry);
     this.add (this.ship);
   }
   
@@ -140,7 +140,7 @@ class MyScene extends THREE.Scene {
   
   //Propiedades del tubo
   var tubularSegments = 200;
-  var radius = 3;
+  var radius = 20;
   var rSegments = 30;
 
 

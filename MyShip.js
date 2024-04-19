@@ -3,54 +3,24 @@ import { CSG } from '../libs/CSG-v2.js'
 import * as TWEEN from '../libs/tween.esm.js' 
 
 class MyShip extends THREE.Object3D {
-  constructor(gui,titleGui, tube) {
+  constructor(gui,titleGui, geomTubo) {
     super();
     
-    // Se crea la parte de la interfaz que corresponde a la caja
-    // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
+    // Creación del GUI
     this.createGUI(gui,titleGui);
     
-    //Tubo
-      //Puntos
-      var l = 100;
-      var points = [
-        new THREE.Vector3(0, 0, 0),
-        new THREE.Vector3(0, 0, l),
-        new THREE.Vector3(-l/2, -l/2, 3*l/4),
-        new THREE.Vector3(l/2, -l/2, l/4),
-        new THREE.Vector3(0, l/2, 0),
-        new THREE.Vector3(-l/2, l/2, l/4),
-        new THREE.Vector3(l/2, l/2, 3*l/4),
-        new THREE.Vector3(l/2, l/2, 3*l/4),
-        new THREE.Vector3(0, -l/2, l),
-        new THREE.Vector3(l, -l/2, l),
-        new THREE.Vector3(l, -l/2, l/2),
-        new THREE.Vector3(0, l/2, l/2),
-        new THREE.Vector3(-l/2, l, 0),
+    //Propiedades
+    this.t = 0; //Posición longitudinal - 0 origen
+    this.time = 40000; //Tiempo en ms
+    this.spd = 1/this.time; //Velocidad 
+    this.rotationSpeed = 0.01; //Velocidad de rotación
+    this.angle = 0; // Rotación de la nave en la superficie del tubo
 
-    ];
-
-    this.spline = new THREE.CatmullRomCurve3( [ 
-      new THREE.Vector3(0, 0, 0),
-      new THREE.Vector3(0, 0, l),
-      new THREE.Vector3(l, 0, l),
-      new THREE.Vector3(l, 0, 0),
-      ], true );
-
-    var geometriaLinea = new THREE.BufferGeometry();
-    geometriaLinea.setFromPoints( this.spline.getPoints(100) );
-    var material = new THREE.LineBasicMaterial( { color: 0x0F0F0F, linewidth: 5} ); 
-    this.recorrido = new THREE.Line(geometriaLinea, material);
-
-    
-    /*this.segmentos = 200;
-    this.binormales = this.spline.computeFrenetFrames(this.segmentos, true).binormals;
-    var origen = {t : 0};
-    var fin = {t : 1};
-    var tTotal = 10000; //10 Segundos*/
-    
-    
-
+    //Tubo - Obtener información del tubo
+    this.tubo = geomTubo;
+    this.path = geomTubo.parameters.path;
+    this.radio = geomTubo.parameters.radius;
+    this.segmentos = geomTubo.parameters.tubularSegments;
 
     //Material
     var textureLoader = new THREE.TextureLoader();
@@ -59,62 +29,56 @@ class MyShip extends THREE.Object3D {
     this.mat.flatShading = true;
     this.mat.needsUpdate = true;
 
-    // Ya podemos construir el Mesh
-    this.mesh = this.createShip();
-    // Y añadirlo como hijo del Object3D (el this)
-    this.add (this.mesh, this.recorrido);
+    // Ya podemos construir el Mesh -- Nodo del personaje + traslación Y
+    this.ship = this.createShip();
 
-    //Animacion
-    var origen = {p:0};
-    var destino = {p : 1};
-  
-    var posicion = this.spline.getPoint(origen.p);
-    this.mesh.position.copy(posicion);
-    var tangente = this.spline.getTangentAt(origen.p); //Orientamos el obj 
-    posicion.add(tangente); 
-    this.mesh.lookAt(posicion); 
-    this.binormales = this.spline.computeFrenetFrames(100 , true ).binormals ;
-    
-    var movimiento = new TWEEN.Tween(origen).to(destino, 10000) //10s 
-    .onUpdate(()=>{ 
-      posicion = this.spline.getPoint(origen.p); //Modificar la pos a la nueva de origen 
-      this.mesh.position.copy(posicion); 
-      var tangente = this.spline.getTangentAt(origen.p); //Orientamos el obj 
-      posicion.add(tangente); 
-      //this.mesh.up = this.binormales[Math.floor(origen.p * 100)]
-      this.mesh.lookAt(posicion);
-      //this.mesh.rotateX(Math.PI/2); 
-      //this.auricular.rotation.x += 0.01; 
-    })
-    .start() 
-    .repeat(Infinity)
-    .onComplete(() => {origen.p = 0;})
-    //Añadir on complete --> que cuando complete una vuelta aumente la velocidad y por tanto se reduzca el tiempo
-    
+    //Nodo - Rotación - Movimiento lateral
+    this.nodoRot = new THREE.Object3D();
+    this.nodoRot.add(this.ship);
+
+    //Nodo Orientación Tubo
+    this.nodoPosOrientTubo = new THREE.Object3D();
+    this.nodoPosOrientTubo.add(this.nodoRot);
+
+    //Colocar el personaje
+    var posTmp = this.path.getPointAt (this.t);
+    this.nodoPosOrientTubo.position.copy(posTmp);
+
+    //Orientación
+    var tangente = this.path.getTangentAt(this.t);
+    posTmp.add(tangente);
+    var segmentoActual = Math.floor(this.t * this.segmentos);
+    this.nodoPosOrientTubo.up = this.tubo.binormals[segmentoActual];
+    this.nodoPosOrientTubo.lookAt (posTmp);
+
+
+    //Añadir
+    this.add(this.nodoPosOrientTubo); 
   }
   
   createShip()
   {
     var ship = new THREE.Object3D();
+    var over = 1; //Distancia a la que vuela de la superficie del tubo
 
     //Trozos
     //Parte de atrás
     var back = this.createBack();
     back.rotateY(Math.PI);
     back.position.z = -2;
-    back.position.y = 3;
+    back.position.y = this.radio + over;
     
 
 
     //Asiento
     var seat = this.createSeat();
     seat.rotateY(Math.PI);
-    seat.position.y = 3;
+    seat.position.y = this.radio + over;
 
     //Parte frontal
     var front = this.createFront();
     front.rotateY(Math.PI);
-    front.position.y = 3;
+    front.position.y = this.radio + over;
 
 
     //Transformaciones
@@ -478,12 +442,9 @@ class MyShip extends THREE.Object3D {
     // Después, la rotación en Y
     // Luego, la rotación en X
     // Y por último la traslación
-   
-    this.position.set (this.guiControls.posX,this.guiControls.posY,this.guiControls.posZ);
-    //this.rotation.set (this.guiControls.rotX,this.guiControls.rotY,this.guiControls.rotZ);
-    this.scale.set (this.guiControls.sizeX,this.guiControls.sizeY,this.guiControls.sizeZ);
-    //this.mesh.rotation.x += 0.01;
-    TWEEN.update();
+    this.angle += this.rotationSpeed;
+    this.nodoRot.rotation.z = this.angle;
+
 
     
 
