@@ -11,8 +11,9 @@ class MyShip extends THREE.Object3D {
     
     //Propiedades
     this.t = 0; //Posición longitudinal - 0 origen
-    this.time = 40000; //Tiempo en ms
-    this.spd = 1/this.time; //Velocidad 
+    this.time = 0; //Tiempo en ms
+    var timeTotal = 4000; //Tiempo total del circuito
+    this.spd = 1/timeTotal; //Velocidad 
     this.rotationSpeed = 0.01; //Velocidad de rotación
     this.angle = 0; // Rotación de la nave en la superficie del tubo
 
@@ -435,6 +436,30 @@ class MyShip extends THREE.Object3D {
     this.mesh.visible = value;
   }
 
+  actualizarPosicion()
+  {
+    //Colocar el personaje
+    var posTmp = this.path.getPointAt (this.t);
+    this.nodoPosOrientTubo.position.copy(posTmp);
+
+    //Orientación
+    var tangente = this.path.getTangentAt(this.t);
+    posTmp.add(tangente);
+    var segmentoActual = Math.floor(this.t * this.segmentos);
+    this.nodoPosOrientTubo.up = this.tubo.binormals[segmentoActual];
+    this.nodoPosOrientTubo.lookAt (posTmp);
+  }
+
+  actualizarRotacion(dir)
+  {
+    //Rotar
+    this.angle += dir* this.rotationSpeed;
+
+    //Ajuste
+    if (this.angle > 2*Math.PI) this.angle = 0;
+    if (this.angle < 0) this.angle = 2*Math.PI; 
+  }
+
   update () {
     // Con independencia de cómo se escriban las 3 siguientes líneas, el orden en el que se aplican las transformaciones es:
     // Primero, el escalado
@@ -442,12 +467,11 @@ class MyShip extends THREE.Object3D {
     // Después, la rotación en Y
     // Luego, la rotación en X
     // Y por último la traslación
-    this.angle += this.rotationSpeed;
+    this.t += this.spd;
+    if (this.t > 1) this.t = 0;
+    this.actualizarPosicion();
+    //this.angle += this.rotationSpeed;
     this.nodoRot.rotation.z = this.angle;
-
-
-    
-
   }
 }
 

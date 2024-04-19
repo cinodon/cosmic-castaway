@@ -5,6 +5,7 @@ import * as THREE from '../libs/three.module.js'
 import { GUI } from '../libs/dat.gui.module.js'
 import { TrackballControls } from '../libs/TrackballControls.js'
 import { Stats } from '../libs/stats.module.js'
+import * as KeyCode from '../libs/keycode.esm.js'
 
 // Clases de mi proyecto
 
@@ -40,7 +41,7 @@ class MyScene extends THREE.Scene {
     this.initStats();
     
     // Construimos los distinos elementos que tendremos en la escena
-    
+
     // Todo elemento que se desee sea tenido en cuenta en el renderizado de la escena debe pertenecer a esta. Bien como hijo de la escena (this en esta clase) o como hijo de un elemento que ya esté en la escena.
     // Tras crear cada elemento se añadirá a la escena con   this.add(variable)
     this.createLights ();
@@ -126,7 +127,7 @@ class MyScene extends THREE.Scene {
   var path = new THREE.CatmullRomCurve3(points, true);
 
   // El material se hará con una textura de cráteres
-  var materialGround = new THREE.MeshBasicMaterial({color: 0x444444})
+  var materialGround = new THREE.MeshNormalMaterial({color: 0x444444})
   /*var materialGround = new THREE.MeshStandardMaterial({
     transparent: true, // Hace que el material sea transparente
     opacity: 0.5, // Ajusta la opacidad del material
@@ -249,6 +250,27 @@ class MyScene extends THREE.Scene {
     this.camera.updateProjectionMatrix();
   }
   
+  onKeyDown(event)
+  {
+    var right = false;
+    var left = false;
+
+    var x = event.which || event.key;
+
+    if (x == KeyControl.KEY_RIGHT) right = true;
+    if (x == KeyControl.KEY_LEFT) left = true;
+
+  }
+
+  onKeyUp(event)
+  {
+    var x = event.which || event.key;
+
+    if (x == KeyControl.KEY_RIGHT) right = false;
+    if (x == KeyControl.KEY_LEFT) left = false;
+    
+  }
+
   onWindowResize () {
     // Este método es llamado cada vez que el usuario modifica el tamapo de la ventana de la aplicación
     // Hay que actualizar el ratio de aspecto de la cámara
@@ -290,7 +312,9 @@ $(function () {
 
   // Se añaden los listener de la aplicación. En este caso, el que va a comprobar cuándo se modifica el tamaño de la ventana de la aplicación.
   window.addEventListener ("resize", () => scene.onWindowResize());
-  
+  window.addEventListener ("keydown", (event) => scene.onKeyDown(event));
+  window.addEventListener ("keyup", (event) => scene.onKeyUp(event));
+
   // Que no se nos olvide, la primera visualización.
   scene.update();
 });
