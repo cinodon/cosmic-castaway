@@ -40,6 +40,11 @@ class MyScene extends THREE.Scene {
     
     this.initStats();
     
+    //Botones
+    this.key_left = false;
+    this.key_right = false;
+
+
     // Construimos los distinos elementos que tendremos en la escena
 
     // Todo elemento que se desee sea tenido en cuenta en el renderizado de la escena debe pertenecer a esta. Bien como hijo de la escena (this en esta clase) o como hijo de un elemento que ya esté en la escena.
@@ -252,13 +257,11 @@ class MyScene extends THREE.Scene {
   
   onKeyDown(event)
   {
-    var right = false;
-    var left = false;
 
     var x = event.which || event.key;
 
-    if (x == KeyControl.KEY_RIGHT) right = true;
-    if (x == KeyControl.KEY_LEFT) left = true;
+    if (x == KeyCode.KEY_RIGHT) this.key_right = true;
+    if (x == KeyCode.KEY_LEFT) this.key_left = true;
 
   }
 
@@ -266,8 +269,8 @@ class MyScene extends THREE.Scene {
   {
     var x = event.which || event.key;
 
-    if (x == KeyControl.KEY_RIGHT) right = false;
-    if (x == KeyControl.KEY_LEFT) left = false;
+    if (x == KeyCode.KEY_RIGHT) this.key_right = false;
+    if (x == KeyCode.KEY_LEFT) this.key_left = false;
     
   }
 
@@ -291,6 +294,8 @@ class MyScene extends THREE.Scene {
     
     // Se actualiza el resto del modelo
     //Nave
+    if (this.key_left == true) this.ship.actualizarRotacion(-1);
+    if (this.key_right == true) this.ship.actualizarRotacion(1);
     this.ship.update();
     
     
