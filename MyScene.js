@@ -71,8 +71,11 @@ class MyScene extends THREE.Scene {
     //this.add (this.model);
 
     //Nave
-    this.ship = new MyShip(this.gui, "Control de la nave", this.tube.geometry);
-    this.add (this.ship);
+    //this.ship = new MyShip(this.gui, "Control de la nave", this.tube.geometry);
+    //this.add (this.ship);
+
+    this.prueba = new MyPrueba(this.gui, "Control modelo");
+    this.add(this.prueba);
   }
   
   initStats() {
@@ -294,10 +297,10 @@ class MyScene extends THREE.Scene {
     
     // Se actualiza el resto del modelo
     //Nave
-    if (this.key_left == true) this.ship.actualizarRotacion(-1);
-    if (this.key_right == true) this.ship.actualizarRotacion(1);
-    this.ship.update();
-    
+    //if (this.key_left == true) this.ship.actualizarRotacion(-1);
+    //if (this.key_right == true) this.ship.actualizarRotacion(1);
+    //this.ship.update();
+    this.prueba.update();
     
     // Le decimos al renderizador "visualiza la escena que te indico usando la cámara que te estoy pasando"
     this.renderer.render (this, this.getCamera());
