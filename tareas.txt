@@ -1,11 +1,19 @@
 DEFENSA 1
-- Nave --> CSG, Revolución(Propulsores), Extrusión(parte de atrás y asiento)
-- Añadir tubo
 --------------------------------------------------------------------------------------------------------
-- Ajustar de nuevo el grafo de la nave para añadir los nodos de transformación -> rotación y traslación
-- Cámara
-- Interacción por teclado --> listeners, eventos y métodos de rotación de la nave
+DEFENSA 2
+--------------------------------------------------------------------------------------------------------
+- Cámara > Definir las dos cámaras
+- Cambio de cámara
+- Colocar objetos en el tubo
 - Definir UserData en cada objeto
-- Colisiones con cajas englobantes --> diapositiva 26 de Colisiones
+- Colisiones > con objetos
+- Disparo (picking)
+- 
+--------------------------------------------------------------------------------------------------------
+
+MECÁNICAS ADICIONALES
+--------------------------------------------------------------------------------------------------------
 - Idea para colocar y cambiar las armas --> poner en la posición las tres armas directamente
     - Poner con el atributo visible --> únicamente el arma equipada
+
+- Aumenta un 10% de la velocidad actual o un 10% de la velocidad inicial?

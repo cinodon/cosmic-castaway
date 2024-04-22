@@ -11,11 +11,15 @@ class MyShip extends THREE.Object3D {
     
     //Propiedades
     this.t = 0; //Posición longitudinal - 0 origen
-    this.time = 0; //Tiempo en ms
-    var timeTotal = 4000; //Tiempo total del circuito
+    var timeTotal = 20; //Tiempo total del circuito en segundos
     this.spd = 1/timeTotal; //Velocidad 
-    this.rotationSpeed = 0.01; //Velocidad de rotación
+    this.inc_spd = this.spd * 0.1; //Incremento de velocidad
+    this.rotationSpeed = 0.05; //Velocidad de rotación
     this.angle = 0; // Rotación de la nave en la superficie del tubo
+
+    //Reloj
+    this.clock = new THREE.Clock();
+    this.clock.start();
 
     //Tubo - Obtener información del tubo
     this.tubo = geomTubo;
@@ -467,8 +471,17 @@ class MyShip extends THREE.Object3D {
     // Después, la rotación en Y
     // Luego, la rotación en X
     // Y por último la traslación
-    this.t += this.spd;
-    if (this.t > 1) this.t = 0;
+    var time = this.clock.getDelta(); 
+    console.log(time);
+    this.t += this.spd * time;
+    if (this.t >= 1) 
+    {
+      //Reiniciar posicion
+      this.t = 0;
+
+      //Aumentar velocidad un %10
+      this.spd += this.inc_spd;
+    }
     this.actualizarPosicion();
     //this.angle += this.rotationSpeed;
     this.nodoRot.rotation.z = this.angle;
