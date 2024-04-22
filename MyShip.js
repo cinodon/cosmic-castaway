@@ -472,8 +472,7 @@ class MyShip extends THREE.Object3D {
     // Luego, la rotación en X
     // Y por último la traslación
     var time = this.clock.getDelta(); 
-    console.log(time);
-    this.t += this.spd * time;
+    //this.t += this.spd * time;
     if (this.t >= 1) 
     {
       //Reiniciar posicion

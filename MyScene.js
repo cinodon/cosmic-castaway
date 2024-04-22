@@ -51,8 +51,9 @@ class MyScene extends THREE.Scene {
     // Tras crear cada elemento se añadirá a la escena con   this.add(variable)
     this.createLights ();
     
-    // Tendremos una cámara con un control de movimiento con el ratón
-    this.createCamera ();
+
+    
+
     
     // Crear tubo
     this.tube = this.createGround();
@@ -67,12 +68,18 @@ class MyScene extends THREE.Scene {
     // Por último creamos el modelo.
     // El modelo puede incluir su parte de la interfaz gráfica de usuario. Le pasamos la referencia a 
     // la gui y el texto bajo el que se agruparán los controles de la interfaz que añada el modelo.
-    //this.model = new MyPirate(this.gui, "Control del cristal", '../imgs/rusty-metal.jpg');
-    //this.add (this.model);
 
     //Nave
     this.ship = new MyShip(this.gui, "Control de la nave", this.tube.geometry);
     this.add (this.ship);
+
+    // Propiedades cámaras
+    this.currentCam = -1;
+
+    this.createCamera();
+
+    //Creacion de la cámara la del player
+    this.createPlayerCamera();
   }
   
   initStats() {
@@ -91,6 +98,16 @@ class MyScene extends THREE.Scene {
     this.stats = stats;
   }
   
+  createPlayerCamera() {
+    // Crear la cámara del personaje
+    this.playerCam = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 500);
+    
+
+    // Agregar la cámara a la escena o al objeto al que pertenece
+    this.add(this.playerCam);
+}
+
+
   createCamera () {
     // Para crear una cámara le indicamos
     //   El ángulo del campo de visión en grados sexagesimales
@@ -107,6 +124,7 @@ class MyScene extends THREE.Scene {
     
     // Para el control de cámara usamos una clase que ya tiene implementado los movimientos de órbita
     this.cameraControl = new TrackballControls (this.camera, this.renderer.domElement);
+
     // Se configuran las velocidades de los movimientos
     this.cameraControl.rotateSpeed = 5;
     this.cameraControl.zoomSpeed = -2;
@@ -242,9 +260,7 @@ class MyScene extends THREE.Scene {
   }
   
   getCamera () {
-    // En principio se devuelve la única cámara que tenemos
-    // Si hubiera varias cámaras, este método decidiría qué cámara devuelve cada vez que es consultado
-    return this.camera;
+    if (this.currentCam == 1) return this.playerCam; else return this.camera;
   }
   
   setCameraAspect (ratio) {
@@ -291,7 +307,7 @@ class MyScene extends THREE.Scene {
     
     // Se actualiza la posición de la cámara según su controlador
     this.cameraControl.update();
-    
+    console.log(this.camera.position.x, " ", this.camera.position.y, " ", this.camera.position.z,)
     // Se actualiza el resto del modelo
     //Nave
     if (this.key_left == true) this.ship.actualizarRotacion(-1);
