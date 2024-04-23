@@ -58,7 +58,7 @@ class MyScene extends THREE.Scene {
     // Crear tubo
     this.tube = this.createGround();
     this.add(this.tube);
-    this.tube.visible = false;
+    //this.tube 
     
     // Y unos ejes. Imprescindibles para orientarnos sobre dónde están las cosas
     // Todas las unidades están en metros
@@ -107,41 +107,15 @@ class MyScene extends THREE.Scene {
     this.PLAYER = 1;
   }
   
-  createPlayerCamera() {
-    // Crear un objeto visual para representar la cámara (por ejemplo, un cubo)
-    var cameraVisual = new THREE.Mesh(
-      new THREE.BoxGeometry(1, 1, 1),
-      new THREE.MeshBasicMaterial({ color: 0xff0000 }) // Material rojo para el objeto visual
-    );
-
-    // Crear la cámara del personaje
-    this.nodeRotCam = new THREE.Object3D();
-    this.playerCam = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 500);
+  createPlayerCamera() 
+  {
+    this.playerCam = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 500);
+    this.ship.ship.add(this.playerCam);
+    this.playerCam.position.set(0, 6, -8);
     
-    
+    this.playerCam.lookAt(this.ship.ship.position);
 
-    this.playerPos = new THREE.Vector3();
-    this.playerPos = this.ship.ship.position;
-    this.playerCam.position.set(0, 26, -8);
-    console.log("Position: ", this.playerPos);
-    
-    
-
-    this.playerRot = new THREE.Vector3();
-    this.ship.getWorldDirection(this.playerRot);
-
-    this.playerCam.lookAt(this.playerPos);
-    // Asignar la posición y la orientación de la cámara al objeto visual
-    cameraVisual.position.copy(this.playerCam.position);
-    cameraVisual.quaternion.copy(this.playerCam.quaternion);
-
-    this.nodeRotCam.rotation.copy(this.ship.nodoRot.rotation);
-    this.nodeRotCam.add(this.playerCam);
-
-    // Agregar la cámara a la escena o al objeto al que pertenece
-    this.add(cameraVisual);
-    this.add(this.nodeRotCam);
-}
+  }
 
 
   createCamera () {
@@ -362,7 +336,9 @@ class MyScene extends THREE.Scene {
     if (this.key_left == true) this.ship.actualizarRotacion(-1);
     if (this.key_right == true) this.ship.actualizarRotacion(1);
     this.ship.update();
-    this.nodeRotCam.rotation.copy(this.ship.nodoRot.rotation);
+
+    //Actualizar la cámara
+
 
     
     

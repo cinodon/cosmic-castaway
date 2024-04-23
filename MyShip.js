@@ -56,7 +56,7 @@ class MyShip extends THREE.Object3D {
     posTmp.add(tangente);
     var segmentoActual = Math.floor(this.t * this.segmentos);
     this.nodoPosOrientTubo.up = this.tubo.binormals[segmentoActual];
-    this.nodoPosOrientTubo.lookAt (posTmp);*/ 
+    this.nodoPosOrientTubo.lookAt (posTmp);*/
 
 
     //Añadir
@@ -456,11 +456,6 @@ class MyShip extends THREE.Object3D {
     this.nodoPosOrientTubo.lookAt (posTmp);
   }
 
-  obtenerPosicion()
-  {
-    return this.nodoPosOrientTubo.position;    
-  }
-
   actualizarRotacion(dir)
   {
     //Rotar
@@ -479,7 +474,7 @@ class MyShip extends THREE.Object3D {
     // Luego, la rotación en X
     // Y por último la traslación
     var time = this.clock.getDelta(); 
-    //this.t += this.spd * time;
+    this.t += this.spd * time;
     if (this.t >= 1) 
     {
       //Reiniciar posicion
@@ -488,7 +483,7 @@ class MyShip extends THREE.Object3D {
       //Aumentar velocidad un %10
       this.spd += this.inc_spd;
     }
-    //this.actualizarPosicion();
+    this.actualizarPosicion();
     //this.angle += this.rotationSpeed;
     this.nodoRot.rotation.z = this.angle;
   }
