@@ -58,6 +58,7 @@ class MyScene extends THREE.Scene {
     // Crear tubo
     this.tube = this.createGround();
     this.add(this.tube);
+    this.tube.visible = false;
     
     // Y unos ejes. Imprescindibles para orientarnos sobre dónde están las cosas
     // Todas las unidades están en metros
@@ -72,6 +73,10 @@ class MyScene extends THREE.Scene {
     //Nave
     this.ship = new MyShip(this.gui, "Control de la nave", this.tube.geometry);
     this.add (this.ship);
+
+    this.box = new MyBox(this.gui, "Caja");
+    this.box.position.copy(this.ship.position);
+    this.add(this.box);
 
     // Propiedades cámaras
     this.currentCam = -1;
@@ -96,15 +101,46 @@ class MyScene extends THREE.Scene {
     $("#Stats-output").append( stats.domElement );
     
     this.stats = stats;
+
+    
+    this.GENERAL = -1;
+    this.PLAYER = 1;
   }
   
   createPlayerCamera() {
+    // Crear un objeto visual para representar la cámara (por ejemplo, un cubo)
+    var cameraVisual = new THREE.Mesh(
+      new THREE.BoxGeometry(1, 1, 1),
+      new THREE.MeshBasicMaterial({ color: 0xff0000 }) // Material rojo para el objeto visual
+    );
+
     // Crear la cámara del personaje
+    this.nodeRotCam = new THREE.Object3D();
     this.playerCam = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 500);
     
+    
+
+    this.playerPos = new THREE.Vector3();
+    this.playerPos = this.ship.ship.position;
+    this.playerCam.position.set(0, 26, -8);
+    console.log("Position: ", this.playerPos);
+    
+    
+
+    this.playerRot = new THREE.Vector3();
+    this.ship.getWorldDirection(this.playerRot);
+
+    this.playerCam.lookAt(this.playerPos);
+    // Asignar la posición y la orientación de la cámara al objeto visual
+    cameraVisual.position.copy(this.playerCam.position);
+    cameraVisual.quaternion.copy(this.playerCam.quaternion);
+
+    this.nodeRotCam.rotation.copy(this.ship.nodoRot.rotation);
+    this.nodeRotCam.add(this.playerCam);
 
     // Agregar la cámara a la escena o al objeto al que pertenece
-    this.add(this.playerCam);
+    this.add(cameraVisual);
+    this.add(this.nodeRotCam);
 }
 
 
@@ -263,6 +299,11 @@ class MyScene extends THREE.Scene {
     if (this.currentCam == 1) return this.playerCam; else return this.camera;
   }
   
+  changeCam()
+  {
+    this.currentCam *= -1;
+  }
+
   setCameraAspect (ratio) {
     // Cada vez que el usuario modifica el tamaño de la ventana desde el gestor de ventanas de
     // su sistema operativo hay que actualizar el ratio de aspecto de la cámara
@@ -290,6 +331,14 @@ class MyScene extends THREE.Scene {
     
   }
 
+  onKeyPress(event)
+  {
+    var x = event.which || event.key;
+
+    //Para cambiar la cámara
+    if (x == KeyCode.KEY_SPACE) this.changeCam();
+  }
+
   onWindowResize () {
     // Este método es llamado cada vez que el usuario modifica el tamapo de la ventana de la aplicación
     // Hay que actualizar el ratio de aspecto de la cámara
@@ -307,12 +356,14 @@ class MyScene extends THREE.Scene {
     
     // Se actualiza la posición de la cámara según su controlador
     this.cameraControl.update();
-    console.log(this.camera.position.x, " ", this.camera.position.y, " ", this.camera.position.z,)
+    //console.log(this.camera.position.x, " ", this.camera.position.y, " ", this.camera.position.z,)
     // Se actualiza el resto del modelo
     //Nave
     if (this.key_left == true) this.ship.actualizarRotacion(-1);
     if (this.key_right == true) this.ship.actualizarRotacion(1);
     this.ship.update();
+    this.nodeRotCam.rotation.copy(this.ship.nodoRot.rotation);
+
     
     
     // Le decimos al renderizador "visualiza la escena que te indico usando la cámara que te estoy pasando"
@@ -333,7 +384,12 @@ $(function () {
 
   // Se añaden los listener de la aplicación. En este caso, el que va a comprobar cuándo se modifica el tamaño de la ventana de la aplicación.
   window.addEventListener ("resize", () => scene.onWindowResize());
+
+  //Listeners de controles
   window.addEventListener ("keydown", (event) => scene.onKeyDown(event));
+  window.addEventListener ("keyup", (event) => scene.onKeyUp(event));
+  window.addEventListener ("keypress", (event) => scene.onKeyPress(event));
+
   window.addEventListener ("keyup", (event) => scene.onKeyUp(event));
 
   // Que no se nos olvide, la primera visualización.

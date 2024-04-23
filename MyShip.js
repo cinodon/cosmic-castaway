@@ -35,7 +35,9 @@ class MyShip extends THREE.Object3D {
     this.mat.needsUpdate = true;
 
     // Ya podemos construir el Mesh -- Nodo del personaje + traslación Y
+    var over = 1;
     this.ship = this.createShip();
+    this.ship.position.y = this.radio + over;
 
     //Nodo - Rotación - Movimiento lateral
     this.nodoRot = new THREE.Object3D();
@@ -46,7 +48,7 @@ class MyShip extends THREE.Object3D {
     this.nodoPosOrientTubo.add(this.nodoRot);
 
     //Colocar el personaje
-    var posTmp = this.path.getPointAt (this.t);
+    /*var posTmp = this.path.getPointAt (this.t);
     this.nodoPosOrientTubo.position.copy(posTmp);
 
     //Orientación
@@ -54,7 +56,7 @@ class MyShip extends THREE.Object3D {
     posTmp.add(tangente);
     var segmentoActual = Math.floor(this.t * this.segmentos);
     this.nodoPosOrientTubo.up = this.tubo.binormals[segmentoActual];
-    this.nodoPosOrientTubo.lookAt (posTmp);
+    this.nodoPosOrientTubo.lookAt (posTmp);*/ 
 
 
     //Añadir
@@ -71,19 +73,19 @@ class MyShip extends THREE.Object3D {
     var back = this.createBack();
     back.rotateY(Math.PI);
     back.position.z = -2;
-    back.position.y = this.radio + over;
+    //back.position.y = this.radio + over;
     
 
 
     //Asiento
     var seat = this.createSeat();
     seat.rotateY(Math.PI);
-    seat.position.y = this.radio + over;
+    //seat.position.y = this.radio + over;
 
     //Parte frontal
     var front = this.createFront();
     front.rotateY(Math.PI);
-    front.position.y = this.radio + over;
+    //front.position.y = this.radio + over;
 
 
     //Transformaciones
@@ -454,6 +456,11 @@ class MyShip extends THREE.Object3D {
     this.nodoPosOrientTubo.lookAt (posTmp);
   }
 
+  obtenerPosicion()
+  {
+    return this.nodoPosOrientTubo.position;    
+  }
+
   actualizarRotacion(dir)
   {
     //Rotar
@@ -481,7 +488,7 @@ class MyShip extends THREE.Object3D {
       //Aumentar velocidad un %10
       this.spd += this.inc_spd;
     }
-    this.actualizarPosicion();
+    //this.actualizarPosicion();
     //this.angle += this.rotationSpeed;
     this.nodoRot.rotation.z = this.angle;
   }
