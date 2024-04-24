@@ -109,10 +109,13 @@ class MyScene extends THREE.Scene {
   
   createPlayerCamera() 
   {
-    this.playerCam = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 500);
+    //Ajustar parámetros de la visión
+    this.playerCam = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 500);
     this.ship.ship.add(this.playerCam);
-    this.playerCam.position.set(0, 6, -8);
-    
+    this.playerCam.position.set(0, 4, -6.5);
+    var camLook = new THREE.Vector3();
+    camLook = this.ship.ship.position;
+
     this.playerCam.lookAt(this.ship.ship.position);
 
   }
@@ -123,7 +126,7 @@ class MyScene extends THREE.Scene {
     //   El ángulo del campo de visión en grados sexagesimales
     //   La razón de aspecto ancho/alto
     //   Los planos de recorte cercano y lejano
-    this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 500);
+    this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
     // Recuerda: Todas las unidades están en metros
     // También se indica dónde se coloca
     this.camera.position.set (4, 2, 4);
@@ -145,7 +148,7 @@ class MyScene extends THREE.Scene {
   
   createGround () {
     //Puntos
-    var l = 100;
+    var l = 200;
     var y = 10;
     var points = [
       new THREE.Vector3(0, y, 0),
@@ -153,7 +156,13 @@ class MyScene extends THREE.Scene {
       new THREE.Vector3(l, l+y, 0),
       new THREE.Vector3(l, l+y, l),
       new THREE.Vector3(0, l+y, l),
+      new THREE.Vector3(0, l+y, 0),
+      
+      new THREE.Vector3(-l, l+y, 0),
+      new THREE.Vector3(-l, l+y, l),
+      new THREE.Vector3(-l, y, l),
       new THREE.Vector3(0, y, l),
+
   ];
 
   //Curva

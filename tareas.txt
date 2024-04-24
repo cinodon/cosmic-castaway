@@ -3,7 +3,6 @@ DEFENSA 1
 DEFENSA 2
 --------------------------------------------------------------------------------------------------------
 - Cámara > Definir las dos cámaras
-- Cambio de cámara
 - Colocar objetos en el tubo
 - Definir UserData en cada objeto
 - Colisiones > con objetos
