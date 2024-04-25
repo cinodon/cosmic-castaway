@@ -26,6 +26,7 @@ class MyBoxHelix extends MyBox {
 
 
     this.helix = this.createHelix();
+    this.helix.userData = this;
     var over = 10;
     /*this.pos = this.position.y;
     this.POS_MAX = this.pos + 0.5;

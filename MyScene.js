@@ -50,11 +50,7 @@ class MyScene extends THREE.Scene {
     // Todo elemento que se desee sea tenido en cuenta en el renderizado de la escena debe pertenecer a esta. Bien como hijo de la escena (this en esta clase) o como hijo de un elemento que ya esté en la escena.
     // Tras crear cada elemento se añadirá a la escena con   this.add(variable)
     this.createLights ();
-    
 
-    
-
-    
     // Crear tubo
     this.tube = this.createGround();
     this.add(this.tube);
@@ -74,6 +70,8 @@ class MyScene extends THREE.Scene {
     this.ship = new MyShip(this.gui, "Control de la nave", this.tube.geometry);
     this.add (this.ship);
 
+
+//------------------------------------------------------------------------------------
     //Rocas
     var nrocks = 40;
     this.rock = [];
@@ -127,7 +125,11 @@ class MyScene extends THREE.Scene {
       this.hbox.push(r);
       this.add(this.hbox[i]);
     }
+//-----------------------------------------------------------------
 
+    //INTERACCION
+    this.mouse = new THREE.Vector2();
+    this.raycaster = new THREE.Raycaster();
 
     // Propiedades cámaras
     this.currentCam = 1;
@@ -136,6 +138,7 @@ class MyScene extends THREE.Scene {
 
     //Creacion de la cámara la del player
     this.createPlayerCamera();
+
   }
   
   initStats() {
@@ -161,7 +164,7 @@ class MyScene extends THREE.Scene {
   createPlayerCamera() 
   {
     //Ajustar parámetros de la visión
-    this.playerCam = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 500);
+    this.playerCam = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 200);
     this.ship.ship.add(this.playerCam);
     this.playerCam.position.set(0, 4, -6.5);
     var camLook = new THREE.Vector3();
@@ -170,7 +173,6 @@ class MyScene extends THREE.Scene {
     this.playerCam.lookAt(this.ship.ship.position);
 
   }
-
 
   createCamera () {
     // Para crear una cámara le indicamos
@@ -220,7 +222,14 @@ class MyScene extends THREE.Scene {
   var path = new THREE.CatmullRomCurve3(points, true);
 
   // El material se hará con una textura de cráteres
-  var materialGround = new THREE.MeshNormalMaterial({color: 0x444444})
+  var text = new THREE.TextureLoader().load('../imgs/crater.jpeg');
+  var materialGround = new THREE.MeshStandardMaterial({
+    color: 0x808080, // Color gris
+    roughness: 0.5, // Controla la aspereza de la superficie (valores entre 0 y 1)
+    metalness: 0.2, // Controla la reflectividad metálica de la superficie (valores entre 0 y 1)
+    map: text
+});
+
   /*var materialGround = new THREE.MeshStandardMaterial({
     transparent: true, // Hace que el material sea transparente
     opacity: 0.5, // Ajusta la opacidad del material
@@ -244,7 +253,7 @@ class MyScene extends THREE.Scene {
 
   return tubeMesh;
   }
-  
+
   createGUI () {
     // Se crea la interfaz gráfica de usuario
     var gui = new GUI();
@@ -318,7 +327,7 @@ class MyScene extends THREE.Scene {
     var renderer = new THREE.WebGLRenderer();
     
     // Se establece un color de fondo en las imágenes que genera el render
-    renderer.setClearColor(new THREE.Color(0xEEEEEE), 1.0);
+    renderer.setClearColor(new THREE.Color(0x1A133C), 1.0);
     
     // Se establece el tamaño, se aprovecha la totalidad de la ventana del navegador
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -374,6 +383,30 @@ class MyScene extends THREE.Scene {
     //Para cambiar la cámara
     if (x == KeyCode.KEY_SPACE) this.changeCam();
     
+  }
+
+  onMouseDown(event)
+  {
+    var x = event.which;
+    //Se pulsa el izquierdo
+    if (x == 1)
+    {
+      this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      this.mouse.y = 1 - 2 * (event.clientY / window.innerHeight);
+
+      this.raycaster.setFromCamera(this.mouse, this.getCamera());
+
+      var pickedObjects = this.raycaster.intersectObjects(this.children, false);
+      if (pickedObjects.length > 0)
+      {
+        var picked = pickedObjects[0].object;
+        if (picked.userData)
+        {
+          picked.userData.disparado();
+        }      
+      }
+
+    }
   }
 
   onWindowResize () {
@@ -454,7 +487,8 @@ $(function () {
   window.addEventListener ("keyup", (event) => scene.onKeyUp(event));
   window.addEventListener ("keypress", (event) => scene.onKeyPress(event));
 
-  window.addEventListener ("keyup", (event) => scene.onKeyUp(event));
+  window.addEventListener ("mousedown", (event) => scene.onMouseDown(event));
+
 
   // Que no se nos olvide, la primera visualización.
   scene.update();
