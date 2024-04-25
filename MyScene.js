@@ -74,12 +74,38 @@ class MyScene extends THREE.Scene {
     this.ship = new MyShip(this.gui, "Control de la nave", this.tube.geometry);
     this.add (this.ship);
 
-    this.box = new MyBox(this.gui, "Caja");
-    this.box.position.copy(this.ship.position);
-    this.add(this.box);
+    //Rocas
+    var nrocks = 40;
+    this.rock = [];
+    for(let i = 0; i < nrocks; i++)
+    {
+      var angMin = 0;
+      var angMax = 2*Math.PI;
+      var a = Math.random() * (angMax - angMin) + angMin;
+      var p = (1/(nrocks)*i);
+      var r = new MyRock(this.gui, "Roca " + i, false, this.tube.geometry, a, p)      
+      this.rock.push(r);
+      this.add(this.rock[i]);
+    }
+
+    //Cristales
+    var ncrystals = 30;
+    this.crystal = [];
+    for(let i = 0; i < ncrystals; i++)
+    {
+      var angMin = 0;
+      var angMax = 2*Math.PI;
+      var a = Math.random() * (angMax - angMin) + angMin;
+      var p = (1/(ncrystals)*i);
+      var r = new MyRock(this.gui, "Cristal " + i, true, this.tube.geometry, a, p)      
+      this.crystal.push(r);
+      this.add(this.crystal[i]);
+    }
+    
+
 
     // Propiedades cámaras
-    this.currentCam = -1;
+    this.currentCam = 1;
 
     this.createCamera();
 
@@ -129,7 +155,7 @@ class MyScene extends THREE.Scene {
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
     // Recuerda: Todas las unidades están en metros
     // También se indica dónde se coloca
-    this.camera.position.set (4, 2, 4);
+    this.camera.position.set (400, 400, 400);
     // Y hacia dónde mira
     var look = new THREE.Vector3 (0,0,0);
     this.camera.lookAt(look);
@@ -285,6 +311,8 @@ class MyScene extends THREE.Scene {
   changeCam()
   {
     this.currentCam *= -1;
+     //Llamar al cambio de ventana por si se ha modificado el tamaño
+     this.onWindowResize()
   }
 
   setCameraAspect (ratio) {
@@ -320,13 +348,18 @@ class MyScene extends THREE.Scene {
 
     //Para cambiar la cámara
     if (x == KeyCode.KEY_SPACE) this.changeCam();
+    
   }
 
   onWindowResize () {
     // Este método es llamado cada vez que el usuario modifica el tamapo de la ventana de la aplicación
     // Hay que actualizar el ratio de aspecto de la cámara
-    this.setCameraAspect (window.innerWidth / window.innerHeight);
-    
+    //this.setCameraAspect (window.innerWidth / window.innerHeight);
+    var camara = this.getCamera();
+    var ratio = window.innerWidth / window.innerHeight;
+    camara.aspect = ratio;
+    camara.updateProjectionMatrix();
+
     // Y también el tamaño del renderizador
     this.renderer.setSize (window.innerWidth, window.innerHeight);
   }
@@ -345,6 +378,7 @@ class MyScene extends THREE.Scene {
     if (this.key_left == true) this.ship.actualizarRotacion(-1);
     if (this.key_right == true) this.ship.actualizarRotacion(1);
     this.ship.update();
+    //this.rock.update();
 
     //Actualizar la cámara
 

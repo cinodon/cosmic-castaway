@@ -11,11 +11,12 @@ class MyShip extends THREE.Object3D {
     
     //Propiedades
     this.t = 0; //Posición longitudinal - 0 origen
-    var timeTotal = 20; //Tiempo total del circuito en segundos
+    var timeTotal = 60; //Tiempo total del circuito en segundos
     this.spd = 1/timeTotal; //Velocidad 
     this.inc_spd = this.spd * 0.1; //Incremento de velocidad
     this.rotationSpeed = 0.05; //Velocidad de rotación
     this.angle = 0; // Rotación de la nave en la superficie del tubo
+    this.on = 1;
 
     //Reloj
     this.clock = new THREE.Clock();
@@ -466,6 +467,13 @@ class MyShip extends THREE.Object3D {
     if (this.angle < 0) this.angle = 2*Math.PI; 
   }
 
+  //Método para debug
+  detenerNave()
+  {
+    this.on *= -1;
+    console.log(this.on);  
+  }
+
   update () {
     // Con independencia de cómo se escriban las 3 siguientes líneas, el orden en el que se aplican las transformaciones es:
     // Primero, el escalado
@@ -474,7 +482,7 @@ class MyShip extends THREE.Object3D {
     // Luego, la rotación en X
     // Y por último la traslación
     var time = this.clock.getDelta(); 
-    this.t += this.spd * time;
+    if (this.on == 1) this.t += this.spd * time;
     if (this.t >= 1) 
     {
       //Reiniciar posicion

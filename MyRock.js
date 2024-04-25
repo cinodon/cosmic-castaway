@@ -3,15 +3,20 @@ import * as THREE from '../libs/three.module.js'
 import { CSG } from '../libs/CSG-v2.js'
  
 class MyRock extends THREE.Object3D {
-  constructor(gui,titleGui, isCrystal) {
+  constructor(gui,titleGui, isCrystal, geomTubo, angle, pos) {
     super();
     
     // Se crea la parte de la interfaz que corresponde a la caja
     // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
     this.createGUI(gui,titleGui);
 
+    //Tubo - Obtener información del tubo
+    this.tubo = geomTubo;
+    this.path = geomTubo.parameters.path;
+    this.radio = geomTubo.parameters.radius;
+    this.segmentos = geomTubo.parameters.tubularSegments;
 
-    // Crear una textura
+    // Crear una textura 
     var textureLoader = new THREE.TextureLoader();
     var texture, textSettings; 
     if (isCrystal == true)
@@ -51,7 +56,35 @@ class MyRock extends THREE.Object3D {
       mesh.scale.set(Math.random() * (max - min) + min, Math.random() * (max - min) + min, Math.random() * (max - min) + min);
     else
       mesh.scale.set(0.7, 1.35, 0.67);
-    this.add(mesh)
+//-----------------------------------------------------------------------
+
+    //Subir la roca r en y
+    mesh.position.y = this.radio - 0.4;
+    mesh.scale.set(mesh.scale.x*3, mesh.scale.y*3, mesh.scale.z*3)
+
+    //Rotación
+    this.nodoRot = new THREE.Object3D();
+    this.nodoRot.add(mesh);
+
+    //Posición
+    this.nodoPosTubo = new THREE.Object3D();
+    this.nodoPosTubo.add(this.nodoRot);
+
+    //Colocar rotación
+    this.nodoRot.rotation.z = angle
+
+    //Posicionar
+    var posTmp = this.path.getPointAt (pos);
+    this.nodoPosTubo.position.copy(posTmp);
+
+    //Orientación
+    var tangente = this.path.getTangentAt(pos);
+    posTmp.add(tangente);
+    var segmentoActual = Math.floor(pos * this.segmentos);
+    this.nodoPosTubo.up = this.tubo.binormals[segmentoActual];
+    this.nodoPosTubo.lookAt (posTmp);
+
+    this.add(this.nodoPosTubo)
   }
   
   createRock()
