@@ -102,8 +102,32 @@ class MyScene extends THREE.Scene {
       this.add(this.crystal[i]);
     }
     
-    this.box = new MyBoxHelix(this.gui, "Box ", this.tube.geometry, Math.PI, 0.1);
-    this.add(this.box);
+    var nboxes = 20;
+    this.box = [];
+    for(let i = 0; i < nboxes; i++)
+    {
+      var angMin = 0;
+      var angMax = 2*Math.PI;
+      var a = Math.random() * (angMax - angMin) + angMin;
+      var p = (1/(nboxes)*i);
+      var r = new MyBox(this.gui, "Box" + i, this.tube.geometry, a, p)      
+      this.box.push(r);
+      this.add(this.box[i]);
+    }
+
+    var nhboxes = 20;
+    this.hbox = [];
+    for(let i = 0; i < nhboxes; i++)
+    {
+      var angMin = 0;
+      var angMax = 2*Math.PI;
+      var a = Math.random() * (angMax - angMin) + angMin;
+      var p = (1/(nhboxes)*i);
+      var r = new MyBoxHelix(this.gui, "Box" + i, this.tube.geometry, a, p)      
+      this.hbox.push(r);
+      this.add(this.hbox[i]);
+    }
+
 
     // Propiedades cámaras
     this.currentCam = 1;
@@ -379,10 +403,30 @@ class MyScene extends THREE.Scene {
     if (this.key_left == true) this.ship.actualizarRotacion(-1);
     if (this.key_right == true) this.ship.actualizarRotacion(1);
     this.ship.update();
-    this.box.update();
+    //this.box.update();
 
-    //Actualizar la cámara
+    //Actualizar rocas
+    for(let i = 0; i < this.rock.length; i++)
+    {
+      this.rock[i].update();
+    }
 
+    for(let i = 0; i < this.crystal.length; i++)
+    {
+      this.crystal[i].update();
+    }
+
+    //Cajas
+    for(let i = 0; i < this.hbox.length; i++)
+    {
+      this.box[i].update();
+    }
+
+    //Actualizar cajas hélice
+    for(let i = 0; i < this.hbox.length; i++)
+    {
+      this.hbox[i].update();
+    }
 
     
     

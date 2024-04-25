@@ -196,7 +196,7 @@ class MyRock extends THREE.Object3D {
     } 
     
     // Se crea una sección para los controles de la caja
-    var folder = gui.addFolder (titleGui);
+    /*var folder = gui.addFolder (titleGui);
     // Estas lineas son las que añaden los componentes de la interfaz
     // Las tres cifras indican un valor mínimo, un máximo y el incremento
     // El método   listen()   permite que si se cambia el valor de la variable en código, el deslizador de la interfaz se actualice
@@ -212,7 +212,7 @@ class MyRock extends THREE.Object3D {
     folder.add (this.guiControls, 'posY', 0.0, 10.0, 0.01).name ('Posición Y : ').listen();
     folder.add (this.guiControls, 'posZ', -20.0, 20.0, 0.01).name ('Posición Z : ').listen();
     
-    folder.add (this.guiControls, 'reset').name ('[ Reset ]');
+    folder.add (this.guiControls, 'reset').name ('[ Reset ]');*/
   }
   
   update () {

@@ -9,7 +9,12 @@ class MyShip extends THREE.Object3D {
     // Creación del GUI
     this.createGUI(gui,titleGui);
     
-    //Propiedades
+    //Estadísticas
+    this.VIDA_MAX = 100;
+    
+
+
+    //Propiedades de movimiento
     this.t = 0; //Posición longitudinal - 0 origen
     var timeTotal = 60; //Tiempo total del circuito en segundos
     this.spd = 1/timeTotal; //Velocidad 
@@ -380,8 +385,9 @@ class MyShip extends THREE.Object3D {
   createGUI (gui,titleGui) {
     // Controles para el tamaño, la orientación y la posición de la caja
     this.guiControls = {
-      sizeX : 1.0,
-      sizeY : 1.0,
+      //vida: this.VIDA_MAX,
+      //sizeX : 1.0,
+      /*sizeY : 1.0,
       sizeZ : 1.0,
       
       rotX : 0.0,
@@ -392,13 +398,14 @@ class MyShip extends THREE.Object3D {
       posY : 0.0,
       posZ : 0.0,
 
-      visible : true,
+      visible : true,*/
       
       // Un botón para dejarlo todo en su posición inicial
       // Cuando se pulse se ejecutará esta función.
       reset : () => {
-        this.guiControls.sizeX = 1.0;
-        this.guiControls.sizeY = 1.0;
+        //this.guiControls.vida = this.VIDA_MAX;
+        //this.guiControls.sizeX = 1.0;
+        /*this.guiControls.sizeY = 1.0;
         this.guiControls.sizeZ = 1.0;
         
         this.guiControls.rotX = 0.0;
@@ -409,17 +416,18 @@ class MyShip extends THREE.Object3D {
         this.guiControls.posY = 0.0;
         this.guiControls.posZ = 0.0;
 
-        this.guiControls.visible = true;
+        this.guiControls.visible = true;*/
+
       }
     } 
     
     // Se crea una sección para los controles de la caja
-    var folder = gui.addFolder (titleGui);
+    //var folder = gui.addFolder (titleGui);
     // Estas lineas son las que añaden los componentes de la interfaz
     // Las tres cifras indican un valor mínimo, un máximo y el incremento
     // El método   listen()   permite que si se cambia el valor de la variable en código, el deslizador de la interfaz se actualice
-    folder.add (this.guiControls, 'sizeX', 0.1, 5.0, 0.01).name ('Tamaño X : ').listen();
-    folder.add (this.guiControls, 'sizeY', 0.1, 5.0, 0.01).name ('Tamaño Y : ').listen();
+    //folder.add (this.guiControls, 'sizeX', 0.1, 5.0, 0.01).name ('Tamaño X : ').listen();
+    /*folder.add (this.guiControls, 'sizeY', 0.1, 5.0, 0.01).name ('Tamaño Y : ').listen();
     folder.add (this.guiControls, 'sizeZ', 0.1, 5.0, 0.01).name ('Tamaño Z : ').listen();
     
     folder.add (this.guiControls, 'rotX', 0.0, Math.PI/2, 0.01).name ('Rotación X : ').listen();
@@ -428,14 +436,7 @@ class MyShip extends THREE.Object3D {
     
     folder.add (this.guiControls, 'posX', -20.0, 20.0, 0.01).name ('Posición X : ').listen();
     folder.add (this.guiControls, 'posY', 0.0, 10.0, 0.01).name ('Posición Y : ').listen();
-    folder.add (this.guiControls, 'posZ', -20.0, 20.0, 0.01).name ('Posición Z : ').listen();
-
-    // Y otro para mostrar u ocultar los ejes
-    folder.add (this.guiControls, 'visible')
-    .name ('Mostrar modelo : ')
-    .onChange ( (value) => this.setShipVisible (value) );
-    
-    folder.add (this.guiControls, 'reset').name ('[ Reset ]');
+    folder.add (this.guiControls, 'posZ', -20.0, 20.0, 0.01).name ('Posición Z : ').listen();*/
   }
   
   setShipVisible(value)

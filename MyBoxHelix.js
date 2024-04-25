@@ -9,8 +9,8 @@ class MyBoxHelix extends MyBox {
     // Aquí no es necesario llamar a this.createGUI(gui, titleGui) ya que se hereda de MyBox
     
     //Animaciones
-    var ANIMS = 3
-    this.anim = 1;
+    var ANIMS = 2;
+    this.anim = Math.floor(Math.random() * ANIMS);
     this.angle = 0;
     this.rotSpd = 0.005;
     this.rotSpdY = 0.01;
@@ -34,6 +34,15 @@ class MyBoxHelix extends MyBox {
     this.box.position.y = this.radio + over;
     if (this.anim == 1) this.box.position.x = 10;
     this.box.add(this.helix);
+
+    if (this.anim == 1)
+    {
+      this.nodoRotY = new THREE.Object3D();
+      this.nodoRot.remove(this.box);
+      this.nodoRotY.add(this.box);
+      this.nodoRot.add(this.nodoRotY);
+    }
+
   }
   
   createHelix() 
@@ -105,7 +114,7 @@ class MyBoxHelix extends MyBox {
       case 1:
         this.angle += this.rotSpdY;
         if (this.angle > 2*Math.PI) this.angle = 0;
-        this.nodoRot.rotation.y = this.angle;
+        this.nodoRotY.rotation.y = this.angle;
 
       break;
 
