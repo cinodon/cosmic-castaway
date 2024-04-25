@@ -396,14 +396,16 @@ class MyScene extends THREE.Scene {
 
       this.raycaster.setFromCamera(this.mouse, this.getCamera());
 
-      var pickedObjects = this.raycaster.intersectObjects(this.children, false);
+      var pickedObjects = this.raycaster.intersectObjects(this.children,);
       if (pickedObjects.length > 0)
       {
         var picked = pickedObjects[0].object;
         if (picked.userData)
         {
-          picked.userData.disparado();
-        }      
+          /*console.log(picked.userData);
+          console.log(picked.userData.id);*/
+          picked.userData.shot(this.ship);
+        }  
       }
 
     }

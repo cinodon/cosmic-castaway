@@ -28,8 +28,8 @@ class MyBox extends THREE.Object3D {
 
 
     this.box = this.createBox(); //;this.createBox();
+    this.userData.shot = this.shot.bind(this);
     this.box.position.y = this.radio;
-    this.box.userData = this;
 
     //Rotación
     this.nodoRot = new THREE.Object3D();
@@ -81,8 +81,18 @@ class MyBox extends THREE.Object3D {
     csg_f.union([c4]);
     var mesh = csg_f.toMesh();
     mesh.position.y = 0.5;
+    mesh.userData = this;
     box.add(mesh);
     return box;
+  }
+
+  shot(ship)
+  {
+    var value = Math.floor(Math.random() * ship.WEAPONS);
+    ship.changeWeapon(value);
+
+    //Romper caja
+    this.nodoRot.remove(this.box);
   }
 
   createGUI (gui,titleGui) {

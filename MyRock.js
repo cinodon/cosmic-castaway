@@ -1,6 +1,7 @@
 import { color } from '../libs/dat.gui.module.js';
 import * as THREE from '../libs/three.module.js'
 import { CSG } from '../libs/CSG-v2.js'
+import { MyCrystal } from './MyCrystal.js';
  
 class MyRock extends THREE.Object3D {
   constructor(gui,titleGui, isCrystal, geomTubo, angle, pos) {
@@ -9,6 +10,9 @@ class MyRock extends THREE.Object3D {
     // Se crea la parte de la interfaz que corresponde a la caja
     // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
     this.createGUI(gui,titleGui);
+
+    //Vida cristal
+    this.hp = 1;
 
     //Tubo - Obtener información del tubo
     this.tubo = geomTubo;
@@ -49,22 +53,32 @@ class MyRock extends THREE.Object3D {
     } 
 
     this.mat = new THREE.MeshStandardMaterial(textSettings);
-    var mesh = this.createRock();
+    this.mesh = this.createRock();
+    this.crystal = this.createCrystal();
+    this.crystal.visible = false;
+    
+    
     var max = 1.5;
     var min = 0.6;
+    this.isCrystal = isCrystal;
     if (isCrystal == false)
-      mesh.scale.set(Math.random() * (max - min) + min, Math.random() * (max - min) + min, Math.random() * (max - min) + min);
+      this.mesh.scale.set(Math.random() * (max - min) + min, Math.random() * (max - min) + min, Math.random() * (max - min) + min);
     else
-      mesh.scale.set(0.7, 1.35, 0.67);
+      this.mesh.scale.set(0.7, 1.35, 0.67);
+
+
+    
 //-----------------------------------------------------------------------
 
     //Subir la roca r en y
-    mesh.position.y = this.radio - 0.4;
-    mesh.scale.set(mesh.scale.x*3, mesh.scale.y*3, mesh.scale.z*3)
+    this.crystal.position.y = this.radio + 1.5;
+    this.crystal.scale.set(this.crystal.scale.x*3, this.crystal.scale.y*3, this.crystal.scale.z*3)
+    this.mesh.position.y = this.radio - 0.4;
+    this.mesh.scale.set(this.mesh.scale.x*3, this.mesh.scale.y*3, this.mesh.scale.z*3)
 
     //Rotación
     this.nodoRot = new THREE.Object3D();
-    this.nodoRot.add(mesh);
+    this.nodoRot.add(this.mesh, this.crystal);
 
     //Posición
     this.nodoPosTubo = new THREE.Object3D();
@@ -87,6 +101,41 @@ class MyRock extends THREE.Object3D {
     this.add(this.nodoPosTubo)
   }
   
+  createCrystal()
+  {
+    //Material
+    var textureLoader = new THREE.TextureLoader();
+    var texture = textureLoader.load('../imgs/mineraltex.jpg');
+    var mat = new THREE.MeshPhysicalMaterial({
+      color: 0x4AF8FF, // Color del cristal
+      transparent: false, // Hacer el material transparente
+      opacity: 0.5, // Nivel de transparencia (0 = completamente transparente, 1 = completamente opaco)
+      roughness: 0.7, // Rugosidad del cristal (0 = completamente liso, 1 = muy rugoso)
+      metalness: 0.4, // Metalidad del cristal (0 = no metálico, 1 = completamente metálico)
+      clearcoat: 1, // Capa transparente adicional para dar brillo al cristal
+      clearcoatRoughness: 0.1, // Rugosidad de la capa transparente
+      transmission: 0.9, // Transmitancia del material (0 = totalmente opaco, 1 = totalmente transparente)
+      ior: 1.5,
+      map: texture
+    });
+
+
+    //
+    var crystal = new THREE.Object3D();
+
+    //Geometria
+    var geom = new THREE.ConeGeometry(1, 1, 3, 1);
+    var m1 = new THREE.Mesh(geom, mat);
+    var m2 = new THREE.Mesh(geom, mat);
+    m2.rotateX(Math.PI);
+    m2.position.y = -0.5;
+
+    crystal.add(m1, m2);
+    crystal.scale.set(0.25, 0.25, 0.25);
+    crystal.position.y = 0.25;
+    return crystal;
+  }
+
   createRock()
   {
     var rock = new THREE.Object3D();
@@ -159,8 +208,47 @@ class MyRock extends THREE.Object3D {
     csg1.subtract([c6]);
     var part = csg1.toMesh();
     part.scale.set(1.5, 1, 1);
+    part.userData = this;
     rock.add(part);
     return rock;
+  }
+
+  shot()
+  {
+    if (this.isCrystal == true)
+    {
+      console.log(this.hp);
+      if (this.hp <= 0)
+      {
+        //Romper el cristal - Efecto de golpe
+        //this.mesh.material.color.set(0xff0000);
+        this.nodoRot.remove(this.mesh);
+        this.crystal.visible = true;
+      }
+      else
+      {
+        var mesh = this.mesh.children.find(child => child instanceof THREE.Mesh);
+        var textureLoader = new THREE.TextureLoader();
+        var texture = textureLoader.load('../imgs/mineraltex-broken.jpg');
+        var textSettings = {
+          color: 0xB3FAFC, // Color del cristal
+          transparent: true, // Hacer el material transparente
+          opacity: 0.9, // Nivel de transparencia (0 = completamente transparente, 1 = completamente opaco)
+          roughness: 0.2, // Rugosidad del cristal (0 = completamente liso, 1 = muy rugoso)
+          metalness: 0.6, // Metalidad del cristal (0 = no metálico, 1 = completamente metálico)
+          clearcoat: 1, // Capa transparente adicional para dar brillo al cristal
+          clearcoatRoughness: 0.1, // Rugosidad de la capa transparente
+          transmission: 0.9, // Transmitancia del material (0 = totalmente opaco, 1 = totalmente transparente)
+          ior: 1.5,
+          map: texture
+        }
+        var mat = new THREE.MeshStandardMaterial(textSettings);
+        mesh.material = mat;
+        this.hp--;
+      }
+
+
+    }
   }
 
   createGUI (gui,titleGui) {
@@ -222,7 +310,7 @@ class MyRock extends THREE.Object3D {
     // Después, la rotación en Y
     // Luego, la rotación en X
     // Y por último la traslación
-   
+    if (this.crystal.visible == true) this.crystal.rotation.y += 0.01;
     this.position.set (this.guiControls.posX,this.guiControls.posY,this.guiControls.posZ);
     this.rotation.set (this.guiControls.rotX,this.guiControls.rotY,this.guiControls.rotZ);
     this.scale.set (this.guiControls.sizeX,this.guiControls.sizeY,this.guiControls.sizeZ);
