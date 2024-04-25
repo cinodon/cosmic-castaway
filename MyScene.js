@@ -304,30 +304,13 @@ class MyScene extends THREE.Scene {
     // Se actualiza el resto del modelo
     //Nave
     this.ship.update();
-    this.pirate.update();
-    this.pirate.position.set(5, 0, 0)
-    
-    //Minerales
-    this.rock.update();
-    this.rock.position.set(-2, 0, 5);
-    this.crystalrock.update();
-    this.crystalrock.position.set(0, 0, 5);
-    this.crystal.update();
-    this.crystal.position.set(1, 0, 5);
     
     //Armas
     this.weapon0.update();
-    this.weapon0.position.set(-4, 0, 0);
     this.weapon1.update();
-    this.weapon1.position.set(-4, 0, -1.3);
     this.weapon2.update();
-    this.weapon2.position.set(-4, 0, -2);
 
-    //Boxes
-    this.box.update();
-    this.box.position.set(2, 0, 5);
-    this.boxh.update();
-    this.boxh.position.set(4, 0, 5);
+
 
     
     // Le decimos al renderizador "visualiza la escena que te indico usando la cámara que te estoy pasando"
