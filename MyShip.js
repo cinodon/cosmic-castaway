@@ -2,6 +2,7 @@ import * as THREE from '../libs/three.module.js'
 import { CSG } from '../libs/CSG-v2.js' 
 import * as TWEEN from '../libs/tween.esm.js' 
 
+
 class MyShip extends THREE.Object3D {
   constructor(gui,titleGui, tube) {
     super();
@@ -49,8 +50,40 @@ class MyShip extends THREE.Object3D {
     var fin = {t : 1};
     var tTotal = 10000; //10 Segundos*/
     
+    //Armas
+    var megaRP1 = this.createMegaRocket();
+    megaRP1.rotation.y = 3*Math.PI/2;
+    megaRP1.position.set(0.9, 1.05, -1.75);
     
+    var megaRP2 = this.createMegaRocket();
+    megaRP2.rotation.y = 3*Math.PI/2;
+    megaRP2.position.set(-0.9, 1.05, -1.75);
 
+    this.megaR = new THREE.Object3D();
+    this.megaR.add(megaRP1, megaRP2);
+
+    var laserCP1 = this.createLaserCanon();
+    laserCP1.rotation.y = 3*Math.PI/2;
+    laserCP1.position.set(0.9, 1.05, -1.75);
+    
+    var laserCP2 = this.createLaserCanon();
+    laserCP2.rotation.y = 3*Math.PI/2;
+    laserCP2.position.set(-0.9, 1.05, -1.75);
+
+    this.laserC = new THREE.Object3D();
+    this.laserC.add(laserCP1, laserCP2);
+
+    var tripleLP1 = this.createTripleLaser();
+    tripleLP1.rotation.y = 3*Math.PI/2;
+    tripleLP1.position.set(0.9, 1.05, -1.75);
+    
+    var tripleLP2 = this.createTripleLaser();
+    tripleLP2.rotation.y = 3*Math.PI/2;
+    tripleLP2.position.set(-0.9, 1.05, -1.75);
+
+    this.tripleL = new THREE.Object3D();
+    this.tripleL.add(tripleLP1, tripleLP2);
+    //-------------------------------------------------------------
 
     //Material
     var textureLoader = new THREE.TextureLoader();
@@ -61,6 +94,7 @@ class MyShip extends THREE.Object3D {
 
     // Ya podemos construir el Mesh
     this.mesh = this.createShip();
+    this.mesh.add(this.megaR, this.laserC, this.tripleL);
     // Y añadirlo como hijo del Object3D (el this)
     this.add (this.mesh);
 
@@ -93,6 +127,338 @@ class MyShip extends THREE.Object3D {
     
   }
   
+  createTripleLaser()
+  {
+    var canon = new THREE.Object3D();
+    
+    //Textures
+    var textureLoader = new THREE.TextureLoader();
+    var texture = textureLoader.load('../imgs/black_leather.jpeg');
+    var mango_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true });
+
+    texture = textureLoader.load('../imgs/weapon-tex.jpg');
+    var culata_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true});
+
+
+    //Creación de geometrías 
+    //---------------------------------
+    //Mango
+    var shape = new THREE.Shape();
+    shape.quadraticCurveTo(0.01, 0.025, 0.05, 0.15);
+    shape.moveTo(0.05, 0.15);
+    shape.lineTo(0.1, 0.15);
+    shape.moveTo(0.1, 0.15);
+    shape.lineTo(0.1, 0);
+
+    //Propiedades
+    var extrudeSettings = {
+      depth: 0.05, // Profundidad de la extrusión
+      bevelEnabled: false // Desactivar el biselado para mantener la forma original
+    };
+
+    var mangoG = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+
+    //Culata
+    var shape = new THREE.Shape();
+    shape.quadraticCurveTo(0.01, 0.025, 0.05, 0.15);
+    shape.moveTo(0.05, 0.15);
+    shape.lineTo(0.4, 0.15);
+    shape.moveTo(0.4, 0.15);
+    shape.lineTo(0.4, 0);
+
+    //Propiedades
+    var extrudeSettings = {
+      depth: 0.1, // Profundidad de la extrusión
+      bevelEnabled: false // Desactivar el biselado para mantener la forma original
+    };
+
+    var culataG = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    
+    //Cañon
+    var cilG1 = new THREE.CylinderGeometry(0.005, 0.005, 0.4);
+    var cilG2 = new THREE.CylinderGeometry(0.05, 0.05, 0.025);
+
+
+    //---------------------------------
+    
+
+
+    //Crear mesh
+    var mangoM = new THREE.Mesh(mangoG, mango_mat) ;
+    var culataM = new THREE.Mesh(culataG, culata_mat) ;
+    var placa1 = new THREE.Mesh(cilG2, culata_mat) ;
+    var placa2 = new THREE.Mesh(cilG2, culata_mat) ;
+    var canonM1 = new THREE.Mesh(cilG1, culata_mat) ;
+    var canonM2 = new THREE.Mesh(cilG1, culata_mat) ;
+    var canonM3 = new THREE.Mesh(cilG1, culata_mat) ;
+
+
+    //Posicionar
+    mangoM.position.x = -0.05;
+    mangoM.position.z = -0.025;
+
+    culataM.position.x = -0.05;
+    culataM.position.z = -0.05;
+    culataM.position.y = 0.15;
+
+    placa1.rotateZ(3*Math.PI/2);
+    placa1.position.y = 0.225;
+    placa1.position.x = 0.36;
+
+    placa2.rotateZ(3*Math.PI/2);
+    placa2.position.y = 0.225;
+    placa2.position.x = 0.5;
+
+    canonM1.rotateZ(3*Math.PI/2);
+    canonM1.position.x = 0.4;
+    canonM1.position.y = 0.225+0.0375;
+
+    canonM2.rotateZ(3*Math.PI/2);
+    canonM2.position.x = 0.4;
+    canonM2.position.z = 0.036;
+    canonM2.position.y = 0.21;
+
+    canonM3.rotateZ(3*Math.PI/2);
+    canonM3.position.x = 0.4;
+    canonM3.position.z = -0.036;
+    canonM3.position.y = 0.21;
+
+    canon.add(mangoM, culataM, canonM1, canonM2, canonM3, placa1, placa2);
+    return canon;
+  }
+
+  createMegaRocket()
+  {
+    var canon = new THREE.Object3D();
+    //Material
+    //----------------------------------------
+    var textureLoader = new THREE.TextureLoader();
+    var texture = textureLoader.load('../imgs/black_leather.jpeg');
+    var mango_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true });
+
+    texture = textureLoader.load('../imgs/bright-metal.jpeg');
+    var part_mat = new THREE.MeshStandardMaterial({
+      map: texture,                    // Utiliza la textura cargada
+      flatShading: false,              // No usar sombreado plano para obtener transiciones de color suaves
+      metalness: 0.5,
+      roughness: 0.2,
+      color: 0xE09437,
+      emissive: 0xFEAE4E,   
+      needsUpdate: true   
+  });
+
+    texture = textureLoader.load('../imgs/weapon-tex.jpg');
+    var culata_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true});
+    //----------------------------------------
+
+    //Creación de geometrías 
+    //---------------------------------
+    //Mango
+    var shape = new THREE.Shape();
+    shape.quadraticCurveTo(0.01, 0.025, 0.05, 0.15);
+    shape.moveTo(0.05, 0.15);
+    shape.lineTo(0.1, 0.15);
+    shape.moveTo(0.1, 0.15);
+    shape.lineTo(0.1, 0);
+
+    //Propiedades
+    var extrudeSettings = {
+      depth: 0.05, // Profundidad de la extrusión
+      bevelEnabled: false // Desactivar el biselado para mantener la forma original
+    };
+
+    var mangoG = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+
+    //Launcher
+    var shape = new THREE.Shape();
+    shape.lineTo(0.01, 0);
+    shape.moveTo(0.01, 0);
+    shape.lineTo(0.15, 0.1);
+    shape.moveTo(0.15, 0.1);
+    shape.lineTo(0.15, 0.12);
+    shape.moveTo(0.15, 0.12);
+    shape.lineTo(0.14, 0.12);
+    shape.moveTo(0.14, 0.12);
+    shape.lineTo(0.14, 0.13);
+    shape.moveTo(0.14, 0.13);
+    shape.lineTo(0.15, 0.13);
+    shape.moveTo(0.15, 0.13);
+    shape.lineTo(0.15, 0.15);
+    shape.moveTo(0.15, 0.15);
+    shape.lineTo(0.15, 0.6);
+    shape.moveTo(0.15, 0.6);
+    shape.lineTo(0.2, 0.75);
+    shape.moveTo(0.2, 0.75);
+    shape.lineTo(0.15, 0.75);
+    shape.moveTo(0.15, 0.75);
+    shape.lineTo(0.05, 0.6);
+    shape.moveTo(0.05, 0.6);
+    shape.lineTo(0, 0.4);
+    shape.moveTo(0, 0.4);
+    var launcherG = new THREE.LatheGeometry(shape.getPoints(), 20, 0, 2*Math.PI);
+
+    var torusG = new THREE.TorusGeometry(0.15, 0.05, 3);
+    //---------------------------------
+    
+
+
+    //Crear mesh
+    var mangoM = new THREE.Mesh(mangoG, mango_mat) ;
+    var launcherM = new THREE.Mesh(launcherG, culata_mat);
+    var partM1 = new THREE.Mesh(torusG, part_mat);
+    var partM2 = new THREE.Mesh(torusG, part_mat);
+    
+
+
+    //Posicionar
+    mangoM.position.x = -0.05;
+    mangoM.position.z = -0.025;
+
+    
+    launcherM.rotateZ(3*Math.PI/2);
+    launcherM.position.x = -0.3;
+    launcherM.position.y = 0.25;
+
+    partM1.rotateY(Math.PI/2);
+    partM1.position.y = 0.25;
+    partM1.position.x = 0.2;
+
+    partM2.rotateY(Math.PI/2);
+    partM2.position.y = 0.25;
+    partM2.position.x = 0.3;
+
+    canon.add(mangoM, launcherM, partM1, partM2);
+    return canon;
+  }
+
+  createLaserCanon()
+  {
+    var canon = new THREE.Object3D();
+
+    //Material
+    //----------------------------------------
+    var textureLoader = new THREE.TextureLoader();
+    var texture = textureLoader.load('../imgs/black_leather.jpeg');
+    var mango_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true });
+
+    texture = textureLoader.load('../imgs/bright-metal.jpeg');
+    var part_mat = new THREE.MeshStandardMaterial({
+      map: texture,                    // Utiliza la textura cargada
+      flatShading: false,              // No usar sombreado plano para obtener transiciones de color suaves
+      metalness: 0.5,
+      roughness: 0.2,
+      color: 0xE09437,
+      emissive: 0xFEAE4E,   
+      needsUpdate: true   
+  });
+
+    texture = textureLoader.load('../imgs/weapon-tex.jpg');
+    var culata_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true});
+    //----------------------------------------
+
+
+    //Creación de geometrías 
+    //---------------------------------
+    //Mango
+    var shape = new THREE.Shape();
+    shape.quadraticCurveTo(0.01, 0.025, 0.05, 0.15);
+    shape.moveTo(0.05, 0.15);
+    shape.lineTo(0.1, 0.15);
+    shape.moveTo(0.1, 0.15);
+    shape.lineTo(0.1, 0);
+
+    //Propiedades
+    var extrudeSettings = {
+      depth: 0.05, // Profundidad de la extrusión
+      bevelEnabled: false // Desactivar el biselado para mantener la forma original
+    };
+
+    var mangoG = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+
+    //Culata
+    var shape = new THREE.Shape();
+    shape.quadraticCurveTo(0.01, 0.025, 0.05, 0.15);
+    shape.moveTo(0.05, 0.15);
+    shape.lineTo(0.4, 0.15);
+    shape.moveTo(0.4, 0.15);
+    shape.lineTo(0.4, 0);
+
+    //Propiedades
+    var extrudeSettings = {
+      depth: 0.1, // Profundidad de la extrusión
+      bevelEnabled: false // Desactivar el biselado para mantener la forma original
+    };
+
+    var culataG = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    
+    //Cañon
+    var shape = new THREE.Shape();
+    shape.lineTo(0.02, 0);
+    shape.moveTo(0.02, 0);
+    shape.lineTo(0.06, 0.033);
+    shape.moveTo(0.06, 0.033);
+    shape.lineTo(0.06, 0.067);
+    shape.moveTo(0.06, 0.067);
+    shape.lineTo(0.02, 0.1);
+    shape.moveTo(0.02, 0.1);
+    shape.lineTo(0.06, 0.133);
+    shape.moveTo(0.06, 0.133);
+    shape.lineTo(0.06, 0.167);
+    shape.moveTo(0.06, 0.167);
+    shape.lineTo(0.02, 0.2);
+    shape.moveTo(0.02, 0.2);
+    shape.lineTo(0.06, 0.233);
+    shape.moveTo(0.06, 0.233);
+    shape.lineTo(0.06, 0.267);
+    shape.moveTo(0.06, 0.267);
+    shape.lineTo(0.02, 0.3);
+    shape.moveTo(0.02, 0.3);
+    shape.lineTo(0, 0.3);
+    shape.moveTo(0, 0.3);
+    shape.lineTo(0.06, 0.3);
+    shape.moveTo(0.06, 0.3);
+    shape.lineTo(0.075, 0.35);
+    shape.moveTo(0.075, 0.35);
+    shape.lineTo(0.06, 0.4);
+    shape.moveTo(0.06, 0.4);
+    shape.lineTo(0.05, 0.4);
+    shape.moveTo(0.05, 0.4);
+    shape.lineTo(0.02, 0.3);
+    shape.moveTo(0.02, 0.3);
+    shape.lineTo(0, 0.3);
+    shape.moveTo(0, 0.3);
+    var canonG = new THREE.LatheGeometry(shape.getPoints(), 20, 0, 2*Math.PI);
+
+
+    //---------------------------------
+    
+
+
+    //Crear mesh
+    var mangoM = new THREE.Mesh(mangoG, mango_mat) ;
+    var culataM = new THREE.Mesh(culataG, culata_mat) ;
+    var canonM = new THREE.Mesh(canonG, part_mat) ;
+
+
+    //Posicionar
+    mangoM.position.x = -0.05;
+    mangoM.position.z = -0.025;
+
+    culataM.position.x = -0.05;
+    culataM.position.z = -0.05;
+    culataM.position.y = 0.15;
+
+    canonM.rotateZ(3*Math.PI/2);
+    canonM.position.y = 0.225;
+    canonM.position.x = 0.35;
+
+
+
+    canon.add(mangoM, culataM, canonM);
+    return canon;
+  }
+
+
   createShip()
   {
     var ship = new THREE.Object3D();

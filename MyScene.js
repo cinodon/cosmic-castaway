@@ -77,29 +77,6 @@ class MyScene extends THREE.Scene {
 
     this.weapon2 = new MyMegaRocket(this.gui, "Control del Mega Cañón");
     this.add (this.weapon2);
-
-    //Pirata
-    this.pirate = new MyPirate(this.gui, "Control de la nave pirata");
-    this.add (this.pirate);
-
-    //Piedra
-    this.rock = new MyRock(this.gui, "Control de la roca", false);
-    this.add (this.rock);
-
-    //Mena de cristales
-    this.crystalrock = new MyRock(this.gui, "Control de la mena de cristales", true);
-    this.add (this.crystalrock);
-
-    //Cristal
-    this.crystal = new MyCrystal(this.gui, "Control del cristal");
-    this.add (this.crystal);
-
-    //Cajas
-    this.box = new MyBox(this.gui, "Control de la caja");
-    this.add (this.box);
-
-    this.boxh = new MyBoxHelix(this.gui, "Control de la caja con hélice");
-    this.add (this.boxh);
  
   }
   

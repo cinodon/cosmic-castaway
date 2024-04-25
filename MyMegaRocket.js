@@ -163,9 +163,9 @@ class MyMegaRocket extends THREE.Object3D {
     folder.add (this.guiControls, 'sizeY', 0.1, 5.0, 0.01).name ('Tamaño Y : ').listen();
     folder.add (this.guiControls, 'sizeZ', 0.1, 5.0, 0.01).name ('Tamaño Z : ').listen();
     
-    folder.add (this.guiControls, 'rotX', 0.0, Math.PI/2, 0.01).name ('Rotación X : ').listen();
-    folder.add (this.guiControls, 'rotY', 0.0, Math.PI/2, 0.01).name ('Rotación Y : ').listen();
-    folder.add (this.guiControls, 'rotZ', 0.0, Math.PI/2, 0.01).name ('Rotación Z : ').listen();
+    folder.add (this.guiControls, 'rotX', 0.0, 2*Math.PI, 0.01).name ('Rotación X : ').listen();
+    folder.add (this.guiControls, 'rotY', 0.0, 2*Math.PI, 0.01).name ('Rotación Y : ').listen();
+    folder.add (this.guiControls, 'rotZ', 0.0, 2*Math.PI, 0.01).name ('Rotación Z : ').listen();
     
     folder.add (this.guiControls, 'posX', -20.0, 20.0, 0.01).name ('Posición X : ').listen();
     folder.add (this.guiControls, 'posY', 0.0, 10.0, 0.01).name ('Posición Y : ').listen();
