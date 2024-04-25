@@ -4,10 +4,17 @@ import { CSG } from '../libs/CSG-v2.js'
 import { MyBox } from './MyBox.js';
 
 class MyBoxHelix extends MyBox {
-  constructor(gui, titleGui) {
-    super(gui, titleGui); // Llama al constructor de la clase padre con los mismos parámetros
+  constructor(gui,titleGui, geomTubo, angle, pos) {
+    super(gui, titleGui, geomTubo, angle, pos); // Llama al constructor de la clase padre con los mismos parámetros
     // Aquí no es necesario llamar a this.createGUI(gui, titleGui) ya que se hereda de MyBox
     
+    //Animaciones
+    var ANIMS = 3
+    this.anim = 1;
+    this.angle = 0;
+    this.rotSpd = 0.005;
+    this.rotSpdY = 0.01;
+
     // Resto del constructor
     //Shape
     //var geom = new THREE.CapsuleGeometry(0.25, 1, 10, 20);
@@ -17,13 +24,16 @@ class MyBoxHelix extends MyBox {
     this.mat.side = THREE.DoubleSide;
 
 
-    this.helix = this.createHelix();
 
-    this.pos = this.position.y;
+    this.helix = this.createHelix();
+    var over = 10;
+    /*this.pos = this.position.y;
     this.POS_MAX = this.pos + 0.5;
     this.POS_MIN = this.pos - 0.5;
-    this.speed = 0.01;
-    this.add(this.helix);
+    this.speed = 0.01;*/
+    this.box.position.y = this.radio + over;
+    if (this.anim == 1) this.box.position.x = 10;
+    this.box.add(this.helix);
   }
   
   createHelix() 
@@ -82,15 +92,39 @@ class MyBoxHelix extends MyBox {
     //Añadir flotar
   }
 
+  animObj()
+  {
+    switch(this.anim)
+    {
+      case 0:
+        this.angle += this.rotSpd;
+        if (this.angle > 2*Math.PI) this.angle = 0;
+        this.nodoRot.rotation.z = this.angle;
+      break;
+
+      case 1:
+        this.angle += this.rotSpdY;
+        if (this.angle > 2*Math.PI) this.angle = 0;
+        this.nodoRot.rotation.y = this.angle;
+
+      break;
+
+      case 2:
+
+      break;
+    }    
+  }
+
   update()
   {
     super.update();
 
 
     this.animationHelix();
-    this.pos += this.speed;
-    if ((this.pos > this.POS_MAX) || (this.pos < this.POS_MIN)) this.speed = -this.speed;
-    this.position.y = this.pos;
+    this.animObj();
+    //this.pos += this.speed;
+    //if ((this.pos > this.POS_MAX) || (this.pos < this.POS_MIN)) this.speed = -this.speed;
+    //this.position.y = this.pos;
   }
 }
 

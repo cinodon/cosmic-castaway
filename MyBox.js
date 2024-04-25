@@ -3,22 +3,51 @@ import * as THREE from '../libs/three.module.js'
 import { CSG } from '../libs/CSG-v2.js'
 
 class MyBox extends THREE.Object3D {
-  constructor(gui,titleGui) {
+  constructor(gui,titleGui, geomTubo, angle, pos) {
     super();
     
     // Se crea la parte de la interfaz que corresponde a la caja
     // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
     this.createGUI(gui,titleGui);
     
+    //Tubo - Obtener información del tubo
+    this.tubo = geomTubo;
+    this.path = geomTubo.parameters.path;
+    this.radio = geomTubo.parameters.radius;
+    this.segmentos = geomTubo.parameters.tubularSegments;
+
     //Shape
     this.mat = new THREE.MeshNormalMaterial();
     this.mat.flatShading = true;
     this.mat.needsUpdate = true;
     this.mat.side = THREE.DoubleSide;
 
-    var mesh = this.createBox(); //;this.createBox();
+    this.box = this.createBox(); //;this.createBox();
+    this.box.position.y = this.radio;
 
-    this.add(mesh)
+    //Rotación
+    this.nodoRot = new THREE.Object3D();
+    this.nodoRot.add(this.box);
+
+    //Posición
+    this.nodoPosTubo = new THREE.Object3D();
+    this.nodoPosTubo.add(this.nodoRot);
+
+    //Colocar rotación
+    this.nodoRot.rotation.z = angle
+
+    //Posicionar
+    var posTmp = this.path.getPointAt (pos);
+    this.nodoPosTubo.position.copy(posTmp);
+
+    //Orientación
+    var tangente = this.path.getTangentAt(pos);
+    posTmp.add(tangente);
+    var segmentoActual = Math.floor(pos * this.segmentos);
+    this.nodoPosTubo.up = this.tubo.binormals[segmentoActual];
+    this.nodoPosTubo.lookAt (posTmp);
+
+    this.add(this.nodoPosTubo);
   }
   
   createBox()
@@ -45,9 +74,8 @@ class MyBox extends THREE.Object3D {
     csg_f.subtract([cube, csubm]);
     csg_f.union([c4]);
     var mesh = csg_f.toMesh();
-
+    mesh.position.y = 0.5;
     box.add(mesh);
-    box.position.y = 0.5;
     return box;
   }
 

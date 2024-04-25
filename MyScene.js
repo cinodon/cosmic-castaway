@@ -102,7 +102,8 @@ class MyScene extends THREE.Scene {
       this.add(this.crystal[i]);
     }
     
-
+    this.box = new MyBoxHelix(this.gui, "Box ", this.tube.geometry, Math.PI, 0.1);
+    this.add(this.box);
 
     // Propiedades cámaras
     this.currentCam = 1;
@@ -378,7 +379,7 @@ class MyScene extends THREE.Scene {
     if (this.key_left == true) this.ship.actualizarRotacion(-1);
     if (this.key_right == true) this.ship.actualizarRotacion(1);
     this.ship.update();
-    //this.rock.update();
+    this.box.update();
 
     //Actualizar la cámara
 
