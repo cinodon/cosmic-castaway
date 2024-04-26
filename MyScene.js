@@ -120,6 +120,20 @@ class MyScene extends THREE.Scene {
       this.collisions.push(this.box[i]);
     }
 
+    var ngears = 12;
+    this.gear = [];
+    for(let i = 0; i < ngears; i++)
+    {
+      var angMin = 0;
+      var angMax = 2*Math.PI;
+      var a = Math.random() * (angMax - angMin) + angMin;
+      var p = (1/(ngears)*i);
+      var r = new MyGear(this.gui, "Gear" + i, this.tube.geometry, a, p)      
+      this.gear.push(r);
+      this.add(this.gear[i]);
+      this.collisions.push(this.gear[i]);
+    }
+
     var nhboxes = 20;
     this.hbox = [];
     for(let i = 0; i < nhboxes; i++)
@@ -378,8 +392,8 @@ class MyScene extends THREE.Scene {
 
     var x = event.which || event.key;
 
-    if (x == KeyCode.KEY_RIGHT) this.key_right = true;
-    if (x == KeyCode.KEY_LEFT) this.key_left = true;
+    if (x == KeyCode.KEY_RIGHT || String.fromCharCode(x) == "D") this.key_right = true;
+    if (x == KeyCode.KEY_LEFT || String.fromCharCode(x) == "A") this.key_left = true;
 
   }
 
@@ -387,8 +401,8 @@ class MyScene extends THREE.Scene {
   {
     var x = event.which || event.key;
 
-    if (x == KeyCode.KEY_RIGHT) this.key_right = false;
-    if (x == KeyCode.KEY_LEFT) this.key_left = false;
+    if (x == KeyCode.KEY_RIGHT || String.fromCharCode(x) == "D") this.key_right = false;
+    if (x == KeyCode.KEY_LEFT || String.fromCharCode(x) == "A") this.key_left = false;
     
   }
 
@@ -497,6 +511,11 @@ class MyScene extends THREE.Scene {
     for(let i = 0; i < this.hbox.length; i++)
     {
       this.hbox[i].update();
+    }
+
+    for(let i = 0; i < this.gear.length; i++)
+    {
+      this.gear[i].update();
     }
 
     //Colisiones

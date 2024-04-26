@@ -6,7 +6,7 @@ class MyGear extends THREE.Object3D {
     
     // Se crea la parte de la interfaz que corresponde a la caja
     // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
-    this.createGUI(gui,titleGui);
+    //this.createGUI(gui,titleGui);
     
     //Tubo - Obtener información del tubo
     this.tubo = geomTubo;
@@ -75,18 +75,19 @@ class MyGear extends THREE.Object3D {
     this.mat = new THREE.MeshNormalMaterial();
     this.mat.flatShading = true;
     this.mat.needsUpdate = true;
-    var mesh = new THREE.Mesh(gearGeometry, this.mat);
+    this.mesh = new THREE.Mesh(gearGeometry, this.mat);
     var over = 10;
-    mesh.position.y = this.radio + over
-    mesh.userData = this;
-    this.groundPos = this.radio;
+    this.mesh.scale.set(0.1, 0.1, 0.1);
+    this.mesh.position.y = this.radio + over
+    this.mesh.userData = this;
+    this.groundPos = this.radio + 1.25;
     this.gravSpd = -0.2; //Gravity
-    var obj = new THREE.Object3D();
-    obj.add(mesh);
+    this.obj = new THREE.Object3D();
+    this.obj.add(this.mesh);
 
     //Rotación
     this.nodoRot = new THREE.Object3D();
-    this.nodoRot.add(obj);
+    this.nodoRot.add(this.obj);
     this.nodoRot.rotation.z = angle;
 
     //Posición
@@ -107,6 +108,11 @@ class MyGear extends THREE.Object3D {
     this.add(this.nodoPosTubo);
   }
   
+  collision(ship)
+  {
+    ship.heal();
+    this.remove(this.nodoPosTubo);
+  }
 
   createGUI (gui,titleGui) {
     // Controles para el tamaño, la orientación y la posición de la caja

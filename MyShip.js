@@ -57,11 +57,11 @@ class MyShip extends THREE.Object3D {
     //---------------------------------------------------------
 
     this.inc_spd = this.spd * 0.1; //Incremento de velocidad
-    this.rotationSpeed = 0.05; //Velocidad de rotación
+    this.rotationSpeed = 0.03; //Velocidad de rotación
     this.angle = 0; // Rotación de la nave en la superficie del tubo
     this.on = 1;  //Hacer que la nave se detenga completamente
     //---------------------------------------------------------
-    
+
     //Reloj
     this.clock = new THREE.Clock();
     this.clock.start();
@@ -909,7 +909,7 @@ class MyShip extends THREE.Object3D {
     //Si es vulnerable 
     if (this.invulnerable == false)
     {
-      if (this.spd > this.MIN_SPD) this.spd = this.spd - this.inc_spd;
+      if (this.spd > this.MIN_SPD) this.spd = this.spd - 2*this.inc_spd;
       this.vida -= value;
       console.log("DAÑO - VIDA:", this.vida);
 
@@ -921,6 +921,7 @@ class MyShip extends THREE.Object3D {
   heal()
   {
     if (this.vida < this.VIDA_MAX) this.vida += 5;
+    this.spd = this.spd + this.inc_spd
     console.log("ARMAZON REPARADO > ", this.vida);
   }
 
@@ -938,7 +939,7 @@ class MyShip extends THREE.Object3D {
       this.invulnerable = false;
       this.hitRpt = 0;
       this.ship.position.y = this.basePos;
-      this.spd = this.spd + this.inc_spd/2; //Recupera un poco la velocidad anterior
+      this.spd = this.spd + this.inc_spd; //Recupera un poco la velocidad anterior
     }
   }
 
