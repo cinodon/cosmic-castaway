@@ -135,7 +135,6 @@ class MyScene extends THREE.Scene {
       this.collisions.push(this.hbox[i]);
     }
 
-    //Añadir los grupos a la escena?
 
 //-----------------------------------------------------------------
 
@@ -419,9 +418,8 @@ class MyScene extends THREE.Scene {
         var picked = pickedObjects[0].object;
         if (picked.userData)
         {
-          /*console.log(picked.userData);
-          console.log(picked.userData.id);*/
-          picked.userData.shot(this.ship);
+
+          picked.userData.shot(this.ship, this);
         }  
       }
 

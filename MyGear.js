@@ -1,13 +1,19 @@
 import * as THREE from '../libs/three.module.js'
  
 class MyGear extends THREE.Object3D {
-  constructor(gui,titleGui) {
+  constructor(gui,titleGui, geomTubo, angle, pos) {
     super();
     
     // Se crea la parte de la interfaz que corresponde a la caja
     // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
     this.createGUI(gui,titleGui);
     
+    //Tubo - Obtener información del tubo
+    this.tubo = geomTubo;
+    this.path = geomTubo.parameters.path;
+    this.radio = geomTubo.parameters.radius;
+    this.segmentos = geomTubo.parameters.tubularSegments;
+
     var teethCount = 10; // Cantidad de dientes en el engranaje
     var toothAngle = Math.PI * 2 / teethCount;
     var outerRadius = 10;
@@ -70,7 +76,35 @@ class MyGear extends THREE.Object3D {
     this.mat.flatShading = true;
     this.mat.needsUpdate = true;
     var mesh = new THREE.Mesh(gearGeometry, this.mat);
-    this.add (mesh);
+    var over = 10;
+    mesh.position.y = this.radio + over
+    mesh.userData = this;
+    this.groundPos = this.radio;
+    this.gravSpd = -0.2; //Gravity
+    var obj = new THREE.Object3D();
+    obj.add(mesh);
+
+    //Rotación
+    this.nodoRot = new THREE.Object3D();
+    this.nodoRot.add(obj);
+    this.nodoRot.rotation.z = angle;
+
+    //Posición
+    this.nodoPosTubo = new THREE.Object3D();
+    this.nodoPosTubo.add(this.nodoRot);
+
+    //Posicionar
+    var posTmp = this.path.getPointAt (pos);
+    this.nodoPosTubo.position.copy(posTmp);
+
+    //Orientación
+    var tangente = this.path.getTangentAt(pos);
+    posTmp.add(tangente);
+    var segmentoActual = Math.floor(pos * this.segmentos);
+    this.nodoPosTubo.up = this.tubo.binormals[segmentoActual];
+    this.nodoPosTubo.lookAt (posTmp);
+
+    this.add(this.nodoPosTubo);
   }
   
 
@@ -133,10 +167,8 @@ class MyGear extends THREE.Object3D {
     // Después, la rotación en Y
     // Luego, la rotación en X
     // Y por último la traslación
-   
-    this.position.set (this.guiControls.posX,this.guiControls.posY,this.guiControls.posZ);
-    this.rotation.set (this.guiControls.rotX,this.guiControls.rotY,this.guiControls.rotZ);
-    this.scale.set (this.guiControls.sizeX,this.guiControls.sizeY,this.guiControls.sizeZ);
+    if (this.mesh.position.y > this.groundPos) this.mesh.position.y += this.gravSpd;
+    this.mesh.rotation.y += 0.05; 
   }
 }
 

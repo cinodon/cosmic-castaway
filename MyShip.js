@@ -16,14 +16,52 @@ class MyShip extends THREE.Object3D {
     this.invulnerable = false;
 
     //Propiedades de movimiento
+    this.initMovementProperties(geomTubo);
+
+    //Armas
+    //----------------------------------------------------------
+    this.initWeapons();
+    //----------------------------------------------------------
+
+
+    // Ya podemos construir el Mesh -- Nodo del personaje + traslación Y - posicionamiento
+    var over = 1;
+    this.ship = this.createShip();
+    this.ship.add(this.megaR, this.laserC, this.tripleL); //Añadimos armas
+    this.ship.position.y = this.radio + over;
+    
+    //HIT PROPERTIES
+    this.initHitProperties();
+
+    //Nodo - Rotación - Movimiento lateral
+    this.nodoRot = new THREE.Object3D();
+    this.nodoRot.add(this.ship);
+
+    //Nodo Orientación Tubo
+    this.nodoPosOrientTubo = new THREE.Object3D();
+    this.nodoPosOrientTubo.add(this.nodoRot);
+
+    //Añadir
+    this.add(this.nodoPosOrientTubo); 
+  }
+  
+  //Inicializar Propiedades
+//----------------------------------------------------------------------
+  initMovementProperties(geomTubo)
+  {
+    //Para controlar espacio, tiempo y velocidad
     this.t = 0; //Posición longitudinal - 0 origen
     var timeTotal = 60; //Tiempo total del circuito en segundos
-    this.spd = 1/timeTotal; //Velocidad 
+    this.spd = 1/timeTotal; //Velocidad
+    this.MIN_SPD =  this.spd/2;
+    //---------------------------------------------------------
+
     this.inc_spd = this.spd * 0.1; //Incremento de velocidad
     this.rotationSpeed = 0.05; //Velocidad de rotación
     this.angle = 0; // Rotación de la nave en la superficie del tubo
-    this.on = 1;
-
+    this.on = 1;  //Hacer que la nave se detenga completamente
+    //---------------------------------------------------------
+    
     //Reloj
     this.clock = new THREE.Clock();
     this.clock.start();
@@ -33,16 +71,10 @@ class MyShip extends THREE.Object3D {
     this.path = geomTubo.parameters.path;
     this.radio = geomTubo.parameters.radius;
     this.segmentos = geomTubo.parameters.tubularSegments;
+  }
 
-    //Material
-    var textureLoader = new THREE.TextureLoader();
-    var texture = textureLoader.load('../imgs/copper.jpeg');
-    this.mat = new THREE.MeshStandardMaterial({ map: texture });
-    this.mat.flatShading = true;
-    this.mat.needsUpdate = true;
-
-    //Armas
-    //----------------------------------------------------------
+  initWeapons()
+  {
     var megaRP1 = this.createMegaRocket();
     megaRP1.rotation.y = 3*Math.PI/2;
     megaRP1.position.set(0.9, 1.05, -1.75);
@@ -75,16 +107,15 @@ class MyShip extends THREE.Object3D {
 
     this.tripleL = new THREE.Object3D();
     this.tripleL.add(tripleLP1, tripleLP2);
-    //----------------------------------------------------------
 
+    //Propiedades iniciales de las armas
+    this.WEAPONS = 3;
+    this.megaR.visible = false;
+    this.tripleL.visible = false;
+  }
 
-    // Ya podemos construir el Mesh -- Nodo del personaje + traslación Y
-    var over = 1;
-    this.ship = this.createShip();
-    this.ship.add(this.megaR, this.laserC, this.tripleL);
-    this.ship.position.y = this.radio + over;
-    
-    //HIT
+  initHitProperties()
+  {
     this.basePos = this.ship.position.y;
     this.hitPos = this.ship.position.y + 2;
     this.hitSpd = 0.5;
@@ -92,38 +123,10 @@ class MyShip extends THREE.Object3D {
     this.HITREPS_TOTAL = 6;
     this.color_val = 0;
     this.color_inc = 1/6;
-    
-
-    //Nodo - Rotación - Movimiento lateral
-    this.nodoRot = new THREE.Object3D();
-    this.nodoRot.add(this.ship);
-
-    //Nodo Orientación Tubo
-    this.nodoPosOrientTubo = new THREE.Object3D();
-    this.nodoPosOrientTubo.add(this.nodoRot);
-
-    //Colocar el personaje
-    /*var posTmp = this.path.getPointAt (this.t);
-    this.nodoPosOrientTubo.position.copy(posTmp);
-
-    //Orientación
-    var tangente = this.path.getTangentAt(this.t);
-    posTmp.add(tangente);
-    var segmentoActual = Math.floor(this.t * this.segmentos);
-    this.nodoPosOrientTubo.up = this.tubo.binormals[segmentoActual];
-    this.nodoPosOrientTubo.lookAt (posTmp);*/
-
-    //Propiedades iniciales de las armas
-    this.WEAPONS = 3;
-    this.megaR.visible = false;
-    this.tripleL.visible = false;
-
-    //this.dmg = 
-
-    //Añadir
-    this.add(this.nodoPosOrientTubo); 
   }
-  
+//----------------------------------------------------------------------
+  //Creación de geometría
+//----------------------------------------------------------------------
   createShip()
   {
     var ship = new THREE.Object3D();
@@ -278,8 +281,10 @@ class MyShip extends THREE.Object3D {
     var texture = textureLoader.load('../imgs/weapon-tex.jpg');
     var metal_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
 
+    //Material
+    var mat = new THREE.MeshStandardMaterial();
     var box_sub_g = new THREE.BoxGeometry(3, 3, 7);
-    var box = new THREE.Mesh(box_sub_g, this.mat);
+    var box = new THREE.Mesh(box_sub_g, mat);
 
     var cil = new THREE.CylinderGeometry(0, 1, 1, 20, 1, false);
     var glass_mat = new THREE.MeshPhysicalMaterial({
@@ -337,8 +342,10 @@ class MyShip extends THREE.Object3D {
     var front = new THREE.Object3D();
     
     //Redondeamos la zona del asiento restando una esfera
+    //Material
+    var mat = new THREE.MeshStandardMaterial();
     var spg = new THREE.SphereGeometry(0.75, 32, 16, 0, Math.PI);
-    var sp = new THREE.Mesh(spg, this.mat);
+    var sp = new THREE.Mesh(spg, mat);
     var cil = new THREE.CylinderGeometry(0.75, 0.75, 2, 32, 16, false);
     var sp2 = new THREE.Mesh(cil, glass_mat);
     
@@ -771,7 +778,7 @@ class MyShip extends THREE.Object3D {
     canon.add(mangoM, culataM, canonM);
     return canon;
   }
-
+//----------------------------------------------------------------------
 
   createGUI (gui,titleGui) {
     // Controles para el tamaño, la orientación y la posición de la caja
@@ -868,6 +875,7 @@ class MyShip extends THREE.Object3D {
 
   changeWeapon(value)
   {
+    console.log("NUEVO ARMA");
     switch(value)
     {
       case 0:
@@ -898,14 +906,22 @@ class MyShip extends THREE.Object3D {
 
   hit(value)
   {
+    //Si es vulnerable 
     if (this.invulnerable == false)
     {
+      if (this.spd > this.MIN_SPD) this.spd = this.spd - this.inc_spd;
       this.vida -= value;
       console.log("DAÑO - VIDA:", this.vida);
 
       //Llamar animación de daño
       this.invulnerable = true;
     }
+  }
+
+  heal()
+  {
+    if (this.vida < this.VIDA_MAX) this.vida += 5;
+    console.log("ARMAZON REPARADO > ", this.vida);
   }
 
   hitAnim()
@@ -922,6 +938,7 @@ class MyShip extends THREE.Object3D {
       this.invulnerable = false;
       this.hitRpt = 0;
       this.ship.position.y = this.basePos;
+      this.spd = this.spd + this.inc_spd/2; //Recupera un poco la velocidad anterior
     }
   }
 

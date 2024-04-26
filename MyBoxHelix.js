@@ -15,6 +15,7 @@ class MyBoxHelix extends MyBox {
     this.rotSpd = 0.005;
     this.rotSpdY = 0.01;
 
+
     // Resto del constructor
     //Shape
     //var geom = new THREE.CapsuleGeometry(0.25, 1, 10, 20);
@@ -28,13 +29,10 @@ class MyBoxHelix extends MyBox {
     this.helix = this.createHelix();
     this.helix.userData = this;
     var over = 10;
-    /*this.pos = this.position.y;
-    this.POS_MAX = this.pos + 0.5;
-    this.POS_MIN = this.pos - 0.5;
-    this.speed = 0.01;*/
     this.box.position.y = this.radio + over;
     if (this.anim == 1) this.box.position.x = 10;
     this.box.add(this.helix);
+    this.box.scale.set(3, 3, 3);
 
     if (this.anim == 1)
     {
@@ -61,6 +59,9 @@ class MyBoxHelix extends MyBox {
     //Ajuste de posiciones
     c1.position.y = 0.8;
     c2.position.y = 1 + 0.5;
+
+    c1.userData = this;
+    c2.userData = this;
     //--------------------------------------------
     //Generar aspas
     var blade_s = new THREE.Shape();
@@ -90,7 +91,11 @@ class MyBoxHelix extends MyBox {
     blade1.position.z = 0.1;
     blade2.position.z = -0.1;
 
+    blade1.userData = this;
+    blade2.userData = this;
+
     helix.add(c1, c2, blade1, blade2);
+    helix.userData = this;
     return helix;
   }
 
@@ -100,6 +105,21 @@ class MyBoxHelix extends MyBox {
     this.helix.rotation.y += 0.1;
     
     //Añadir flotar
+  }
+
+  shot(ship, scene)
+  {
+    var value = Math.floor(Math.random() * ship.WEAPONS);
+    ship.changeWeapon(value);
+
+    //Romper caja
+    this.box.remove(this.helix);
+    if (this.anim == 1) this.nodoRot.remove(this.nodoRotY); else this.nodoRot.remove(this.box);
+
+    //Recuperar vida
+    ship.heal();
+
+    scene.remove(this);
   }
 
   animObj()
