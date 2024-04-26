@@ -15,6 +15,8 @@ class MyShip extends THREE.Object3D {
     this.mineral = 0;   //Equivalente a puntos
     this.invulnerable = false;
 
+    this.partPos = []; //Objeto para almacenar Obj3D importantes para castear rayos
+
     //Propiedades de movimiento
     this.initMovementProperties(geomTubo);
 
@@ -29,6 +31,7 @@ class MyShip extends THREE.Object3D {
     this.ship = this.createShip();
     this.ship.add(this.megaR, this.laserC, this.tripleL); //Añadimos armas
     this.ship.position.y = this.radio + over;
+    this.partPos.push(this.ship);
     
     //HIT PROPERTIES
     this.initHitProperties();
@@ -261,7 +264,7 @@ class MyShip extends THREE.Object3D {
     propb3.scale.set(0.5, 0.5, 1);
     propb4.scale.set(0.5, 0.5, 1);
 
-
+    this.partPos.push(prop1, prop2);
     back.add(propb, propb2, propb3, propb4);
     back.add(partBack);
     back.add(prop1);

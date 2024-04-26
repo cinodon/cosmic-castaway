@@ -33,6 +33,7 @@ class MyBox extends THREE.Object3D {
     this.box = this.createBox(); //;this.createBox();
     this.userData.shot = this.shot.bind(this);
     this.box.position.y = this.radio;
+    this.box.scale.set(3, 3, 3);
 
     //Rotación
     this.nodoRot = new THREE.Object3D();

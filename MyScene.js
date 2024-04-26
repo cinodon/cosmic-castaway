@@ -65,7 +65,7 @@ class MyScene extends THREE.Scene {
     this.ship = new MyShip(this.gui, "Control de la nave", this.tube.geometry);
     this.add (this.ship);
 
-    
+
 //Creación de objetos en el tubo
 //------------------------------------------------------------------------------------
     this.pickables = [];
@@ -425,7 +425,7 @@ class MyScene extends THREE.Scene {
 
       this.raycaster.setFromCamera(this.mouse, this.getCamera());
 
-      var pickedObjects = this.raycaster.intersectObjects(this.pickables,);
+      var pickedObjects = this.raycaster.intersectObjects(this.pickables);
       if (pickedObjects.length > 0)
       {
         var picked = pickedObjects[0].object;
@@ -454,22 +454,56 @@ class MyScene extends THREE.Scene {
 
   checkCollision()
   {
+    var rayos = 5;
     var pos = new THREE.Vector3();
-    this.ship.ship.getWorldPosition(pos);
     var dir = new THREE.Vector3();
 
-    this.ship.ship.getWorldDirection(dir);
     this.collisionRay.set(pos, dir);
-    //console.log(pos, " ", dir);
-    var colisiones = this.collisionRay.intersectObjects(this.collisions, true);
-    if (colisiones.length > 0)
+    for (let i = 0; i < rayos; i++)
     {
-      var closest = colisiones[0].object;
-      if (closest.userData)
+      //Determinar posición y dirección
+      if (i < 3)
       {
-        closest.userData.collision(this.ship);
+        this.ship.partPos[i].getWorldPosition(pos);
+        this.ship.ship.getWorldDirection(dir);
+
+        //En el caso de los propulsores
+        if (i > 1)
+        {
+          pos.z += 3.36; //Propulsor size --> considerar cambiar a constante
+          //Aplicar rotación
+          let x = dir.x;
+          dir.x = dir.z;
+          dir.z = x;
+        }
+      }
+      else
+      {
+        //Parto de la posición
+        this.ship.ship.getWorldPosition(pos);
+        this.ship.ship.getWorldDirection(dir);
+
+        if (i == 3) pos.x -= 1.5; 
+        if (i == 4) pos.x += 1.5;
+      }
+      
+
+      //Establecer rayo
+      this.collisionRay.set(pos, dir);
+
+      //Comprobar colisión
+      var colisiones = this.collisionRay.intersectObjects(this.collisions, true);
+      if (colisiones.length > 0)
+      {
+        var closest = colisiones[0].object;
+        if (closest.userData)
+        {
+          closest.userData.collision(this.ship);
+          break;
+        }
       }
     }
+
   }
 
   update () {
