@@ -28,11 +28,12 @@ class MyBoxHelix extends MyBox {
 
     this.helix = this.createHelix();
     this.helix.userData = this;
+    //this.helix.scale.set(3, 3, 3);
     var over = 10;
     this.box.position.y = this.radio + over;
     if (this.anim == 1) this.box.position.x = 10;
     this.box.add(this.helix);
-    this.box.scale.set(3, 3, 3);
+    
 
     if (this.anim == 1)
     {
