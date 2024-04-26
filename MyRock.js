@@ -61,6 +61,7 @@ class MyRock extends THREE.Object3D {
     var max = 1.5;
     var min = 0.6;
     this.isCrystal = isCrystal;
+    this.dmg = 10; //Daño que causa chocarse contra la piedra
     if (isCrystal == false)
       this.mesh.scale.set(Math.random() * (max - min) + min, Math.random() * (max - min) + min, Math.random() * (max - min) + min);
     else
@@ -129,10 +130,12 @@ class MyRock extends THREE.Object3D {
     var m2 = new THREE.Mesh(geom, mat);
     m2.rotateX(Math.PI);
     m2.position.y = -0.5;
-
+    m1.userData = this;
+    m2.userData = this;
     crystal.add(m1, m2);
     crystal.scale.set(0.25, 0.25, 0.25);
     crystal.position.y = 0.25;
+    crystal.userData = this;
     return crystal;
   }
 
@@ -213,41 +216,70 @@ class MyRock extends THREE.Object3D {
     return rock;
   }
 
+  breakCrystal()
+  {
+    this.nodoRot.remove(this.mesh);
+    this.crystal.visible = true;
+  }
+
   shot()
+  {
+    if (this.crystal.visible == false)
+    {
+      if (this.isCrystal == true)
+      {
+        
+        if (this.hp <= 0)
+        {
+          //Romper el cristal - Efecto de golpe
+          //this.mesh.material.color.set(0xff0000);
+          this.breakCrystal();
+        }
+        else
+        {
+          var mesh = this.mesh.children.find(child => child instanceof THREE.Mesh);
+          var textureLoader = new THREE.TextureLoader();
+          var texture = textureLoader.load('../imgs/mineraltex-broken.jpg');
+          var textSettings = {
+            color: 0xB3FAFC, // Color del cristal
+            transparent: true, // Hacer el material transparente
+            opacity: 0.9, // Nivel de transparencia (0 = completamente transparente, 1 = completamente opaco)
+            roughness: 0.2, // Rugosidad del cristal (0 = completamente liso, 1 = muy rugoso)
+            metalness: 0.6, // Metalidad del cristal (0 = no metálico, 1 = completamente metálico)
+            clearcoat: 1, // Capa transparente adicional para dar brillo al cristal
+            clearcoatRoughness: 0.1, // Rugosidad de la capa transparente
+            transmission: 0.9, // Transmitancia del material (0 = totalmente opaco, 1 = totalmente transparente)
+            ior: 1.5,
+            map: texture
+          }
+          var mat = new THREE.MeshStandardMaterial(textSettings);
+          mesh.material = mat;
+          this.hp--;
+        }
+      }
+    }
+  }
+
+  collision(ship)
   {
     if (this.isCrystal == true)
     {
-      console.log(this.hp);
-      if (this.hp <= 0)
+      //No es mineral
+      if (this.crystal.visible == false)
       {
-        //Romper el cristal - Efecto de golpe
-        //this.mesh.material.color.set(0xff0000);
-        this.nodoRot.remove(this.mesh);
-        this.crystal.visible = true;
+        ship.hit(this.dmg);
+        this.breakCrystal();
       }
       else
       {
-        var mesh = this.mesh.children.find(child => child instanceof THREE.Mesh);
-        var textureLoader = new THREE.TextureLoader();
-        var texture = textureLoader.load('../imgs/mineraltex-broken.jpg');
-        var textSettings = {
-          color: 0xB3FAFC, // Color del cristal
-          transparent: true, // Hacer el material transparente
-          opacity: 0.9, // Nivel de transparencia (0 = completamente transparente, 1 = completamente opaco)
-          roughness: 0.2, // Rugosidad del cristal (0 = completamente liso, 1 = muy rugoso)
-          metalness: 0.6, // Metalidad del cristal (0 = no metálico, 1 = completamente metálico)
-          clearcoat: 1, // Capa transparente adicional para dar brillo al cristal
-          clearcoatRoughness: 0.1, // Rugosidad de la capa transparente
-          transmission: 0.9, // Transmitancia del material (0 = totalmente opaco, 1 = totalmente transparente)
-          ior: 1.5,
-          map: texture
-        }
-        var mat = new THREE.MeshStandardMaterial(textSettings);
-        mesh.material = mat;
-        this.hp--;
+        ship.getCrystal();
+        this.nodoRot.remove(this.crystal);
       }
-
-
+    }
+    else
+    {
+      //Es una roca
+      ship.hit(this.dmg);
     }
   }
 

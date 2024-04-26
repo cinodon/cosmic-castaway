@@ -11,8 +11,9 @@ class MyShip extends THREE.Object3D {
     
     //Estadísticas
     this.VIDA_MAX = 100;
-    
-
+    this.vida = this.VIDA_MAX;
+    this.mineral = 0;   //Equivalente a puntos
+    this.invulnerable = false;
 
     //Propiedades de movimiento
     this.t = 0; //Posición longitudinal - 0 origen
@@ -82,7 +83,16 @@ class MyShip extends THREE.Object3D {
     this.ship = this.createShip();
     this.ship.add(this.megaR, this.laserC, this.tripleL);
     this.ship.position.y = this.radio + over;
-
+    
+    //HIT
+    this.basePos = this.ship.position.y;
+    this.hitPos = this.ship.position.y + 2;
+    this.hitSpd = 0.5;
+    this.hitRpt = 0;
+    this.HITREPS_TOTAL = 6;
+    this.color_val = 0;
+    this.color_inc = 1/6;
+    
 
     //Nodo - Rotación - Movimiento lateral
     this.nodoRot = new THREE.Object3D();
@@ -155,6 +165,7 @@ class MyShip extends THREE.Object3D {
     var rusty_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
     texture = textureLoader.load('../imgs/red-metal.jpeg');
     var red_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
+    
 
     //Parte trasera
     //--------------------------------------------------------------------------------
@@ -284,6 +295,7 @@ class MyShip extends THREE.Object3D {
       side: THREE.DoubleSide
     });
 
+
     var geom = new THREE.CapsuleGeometry(0.25, 1, 10, 20);
     
     var glass = new THREE.Mesh(cil, glass_mat);
@@ -372,6 +384,7 @@ class MyShip extends THREE.Object3D {
     var seat_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
     var texture = textureLoader.load('../imgs/rusty-metal.jpg');
     var plate_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
+
 
     //Partes
     //Placa de sujección
@@ -877,6 +890,40 @@ class MyShip extends THREE.Object3D {
     }
   }
   
+  getCrystal()
+  {
+    this.mineral++;
+    console.log("MINERAL: ", this.mineral);
+  }
+
+  hit(value)
+  {
+    if (this.invulnerable == false)
+    {
+      this.vida -= value;
+      console.log("DAÑO - VIDA:", this.vida);
+
+      //Llamar animación de daño
+      this.invulnerable = true;
+    }
+  }
+
+  hitAnim()
+  {
+    this.ship.position.y += this.hitSpd;
+    if ((this.ship.position.y > this.hitPos) || (this.ship.position.y <= this.basePos))
+    {
+      this.hitSpd *= -1;
+      this.hitRpt++;
+    }
+
+    if (this.hitRpt == this.HITREPS_TOTAL)
+    {
+      this.invulnerable = false;
+      this.hitRpt = 0;
+      this.ship.position.y = this.basePos;
+    }
+  }
 
   update () {
     // Con independencia de cómo se escriban las 3 siguientes líneas, el orden en el que se aplican las transformaciones es:
@@ -898,6 +945,9 @@ class MyShip extends THREE.Object3D {
     this.actualizarPosicion();
     //this.angle += this.rotationSpeed;
     this.nodoRot.rotation.z = this.angle;
+
+    //Animación de recibir daño
+    if (this.invulnerable == true) this.hitAnim();
   }
 }
 

@@ -72,6 +72,8 @@ class MyScene extends THREE.Scene {
 
 
 //------------------------------------------------------------------------------------
+    this.pickables = [];
+    this.collisions = [];
     //Rocas
     var nrocks = 40;
     this.rock = [];
@@ -84,6 +86,7 @@ class MyScene extends THREE.Scene {
       var r = new MyRock(this.gui, "Roca " + i, false, this.tube.geometry, a, p)      
       this.rock.push(r);
       this.add(this.rock[i]);
+      this.collisions.push(this.rock[i]);
     }
 
     //Cristales
@@ -98,6 +101,8 @@ class MyScene extends THREE.Scene {
       var r = new MyRock(this.gui, "Cristal " + i, true, this.tube.geometry, a, p)      
       this.crystal.push(r);
       this.add(this.crystal[i]);
+      this.pickables.push(this.crystal[i]);
+      this.collisions.push(this.crystal[i]);
     }
     
     var nboxes = 20;
@@ -111,6 +116,8 @@ class MyScene extends THREE.Scene {
       var r = new MyBox(this.gui, "Box" + i, this.tube.geometry, a, p)      
       this.box.push(r);
       this.add(this.box[i]);
+      this.pickables.push(this.box[i]);
+      this.collisions.push(this.box[i]);
     }
 
     var nhboxes = 20;
@@ -124,12 +131,21 @@ class MyScene extends THREE.Scene {
       var r = new MyBoxHelix(this.gui, "Box" + i, this.tube.geometry, a, p)      
       this.hbox.push(r);
       this.add(this.hbox[i]);
+      this.pickables.push(this.hbox[i]);
+      this.collisions.push(this.hbox[i]);
     }
+
+    //Añadir los grupos a la escena?
+
 //-----------------------------------------------------------------
 
     //INTERACCION
     this.mouse = new THREE.Vector2();
     this.raycaster = new THREE.Raycaster();
+    var distance = 4;
+    this.collisionRay = new THREE.Raycaster(new THREE. Vector3 ( ) , new THREE. Vector3 (0 ,0 ,1) , 0 , distance);
+    
+   
 
     // Propiedades cámaras
     this.currentCam = 1;
@@ -138,6 +154,7 @@ class MyScene extends THREE.Scene {
 
     //Creacion de la cámara la del player
     this.createPlayerCamera();
+
 
   }
   
@@ -396,7 +413,7 @@ class MyScene extends THREE.Scene {
 
       this.raycaster.setFromCamera(this.mouse, this.getCamera());
 
-      var pickedObjects = this.raycaster.intersectObjects(this.children,);
+      var pickedObjects = this.raycaster.intersectObjects(this.pickables,);
       if (pickedObjects.length > 0)
       {
         var picked = pickedObjects[0].object;
@@ -422,6 +439,27 @@ class MyScene extends THREE.Scene {
 
     // Y también el tamaño del renderizador
     this.renderer.setSize (window.innerWidth, window.innerHeight);
+  }
+
+  checkCollision()
+  {
+    var pos = new THREE.Vector3();
+    this.ship.ship.getWorldPosition(pos);
+    var dir = new THREE.Vector3();
+    this.ship.ship.getWorldDirection(dir);
+    this.collisionRay.set(pos, dir);
+    //console.log(pos, " ", dir);
+    var colisiones = this.collisionRay.intersectObjects(this.collisions, true);
+    if (colisiones.length > 0)
+    {
+      var closest = colisiones[0].object;
+      if (closest.userData)
+      {
+        closest.userData.collision(this.ship);
+      }
+    }
+
+
   }
 
   update () {
@@ -463,6 +501,8 @@ class MyScene extends THREE.Scene {
       this.hbox[i].update();
     }
 
+    //Colisiones
+    this.checkCollision();
     
     
     // Le decimos al renderizador "visualiza la escena que te indico usando la cámara que te estoy pasando"

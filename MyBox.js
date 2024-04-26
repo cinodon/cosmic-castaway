@@ -10,6 +10,9 @@ class MyBox extends THREE.Object3D {
     // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
     this.createGUI(gui,titleGui);
     
+    //Propiedades
+    this.dmg = 5;
+
     //Tubo - Obtener información del tubo
     this.tubo = geomTubo;
     this.path = geomTubo.parameters.path;
@@ -71,6 +74,12 @@ class MyBox extends THREE.Object3D {
     c2.scale.set(0.5, 0.5, 1);
     c3.scale.set(1, 0.5, 0.5);
     c4.scale.set(0.75, 0.75, 0.75);
+    c1.userData = this;
+    c2.userData = this;
+    c3.userData = this;
+    c4.userData = this;
+  
+
 
     var csub = new CSG();
     csub.union([c1,c2,c3]);
@@ -93,6 +102,12 @@ class MyBox extends THREE.Object3D {
 
     //Romper caja
     this.nodoRot.remove(this.box);
+  }
+
+  collision(ship)
+  {
+    this.shot(ship);
+    ship.hit(this.dmg);
   }
 
   createGUI (gui,titleGui) {
