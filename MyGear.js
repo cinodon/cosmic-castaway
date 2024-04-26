@@ -72,10 +72,8 @@ class MyGear extends THREE.Object3D {
     //var gearGeometry = new THREE.ExtrudeGeometry(gearShape, extrudeSettings);
     var gearGeometry = new THREE.ExtrudeGeometry(gearShape, extrudeSettings);
     //Material
-    this.mat = new THREE.MeshNormalMaterial();
-    this.mat.flatShading = true;
-    this.mat.needsUpdate = true;
-    this.mesh = new THREE.Mesh(gearGeometry, this.mat);
+    var mat = new THREE.MeshStandardMaterial({color: 0xB7AAA1});
+    this.mesh = new THREE.Mesh(gearGeometry, mat);
     var over = 10;
     this.mesh.scale.set(0.1, 0.1, 0.1);
     this.mesh.position.y = this.radio + over

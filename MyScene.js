@@ -10,17 +10,12 @@ import * as KeyCode from '../libs/keycode.esm.js'
 // Clases de mi proyecto
 
 import { MyShip} from './MyShip.js'
-import { MyCrystal } from './MyCrystal.js'
 import { MyGear } from './MyGear.js'
-import { MySeat } from './MySeat.js' 
 import { MyBox } from './MyBox.js'
 import { MyBoxHelix } from './MyBoxHelix.js'
 import { MyRock } from './MyRock.js'
 import { MyPirate } from './MyPirate.js'
-import { MyLaserCannon } from './MyLaserCannon.js'
-import { MyTripleLaser } from './MyTripleLaser.js'
-import { MyMegaRocket } from './MyMegaRocket.js'
-import { MyPrueba } from './MyPrueba.js'
+
 
 
 /// La clase fachada del modelo
@@ -70,7 +65,8 @@ class MyScene extends THREE.Scene {
     this.ship = new MyShip(this.gui, "Control de la nave", this.tube.geometry);
     this.add (this.ship);
 
-
+    
+//Creación de objetos en el tubo
 //------------------------------------------------------------------------------------
     this.pickables = [];
     this.collisions = [];
@@ -105,6 +101,7 @@ class MyScene extends THREE.Scene {
       this.collisions.push(this.crystal[i]);
     }
     
+    //Cajas
     var nboxes = 20;
     this.box = [];
     for(let i = 0; i < nboxes; i++)
@@ -120,6 +117,7 @@ class MyScene extends THREE.Scene {
       this.collisions.push(this.box[i]);
     }
 
+    //Chatarra
     var ngears = 12;
     this.gear = [];
     for(let i = 0; i < ngears; i++)
@@ -134,6 +132,7 @@ class MyScene extends THREE.Scene {
       this.collisions.push(this.gear[i]);
     }
 
+    //Objetos voladores
     var nhboxes = 20;
     this.hbox = [];
     for(let i = 0; i < nhboxes; i++)
@@ -458,6 +457,7 @@ class MyScene extends THREE.Scene {
     var pos = new THREE.Vector3();
     this.ship.ship.getWorldPosition(pos);
     var dir = new THREE.Vector3();
+
     this.ship.ship.getWorldDirection(dir);
     this.collisionRay.set(pos, dir);
     //console.log(pos, " ", dir);
@@ -470,8 +470,6 @@ class MyScene extends THREE.Scene {
         closest.userData.collision(this.ship);
       }
     }
-
-
   }
 
   update () {
