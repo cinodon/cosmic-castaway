@@ -2,17 +2,12 @@ DEFENSA 1
 --------------------------------------------------------------------------------------------------------
 DEFENSA 2
 --------------------------------------------------------------------------------------------------------
-- Cámara > Definir las dos cámaras
-- Colocar objetos en el tubo
-- Definir UserData en cada objeto
-- Colisiones > con objetos
-- Disparo (picking)
-- 
+DEFENSA 3
 --------------------------------------------------------------------------------------------------------
-
-MECÁNICAS ADICIONALES
+- Creación de Luces
+    - Crear un "Sol en el centro del tubo (en los huecos)
+    - Crear una luz enganchada al personaje que cambie de color en función de lo que ocurra
+    - Barras de Vida
+    - Marcador de velocidad
+    - Indicador de minerales recogidos
 --------------------------------------------------------------------------------------------------------
-- Idea para colocar y cambiar las armas --> poner en la posición las tres armas directamente
-    - Poner con el atributo visible --> únicamente el arma equipada
-
-- Aumenta un 10% de la velocidad actual o un 10% de la velocidad inicial?
