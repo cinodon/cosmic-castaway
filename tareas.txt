@@ -5,8 +5,10 @@ DEFENSA 2
 DEFENSA 3
 --------------------------------------------------------------------------------------------------------
 - Creación de Luces
-    - Crear un "Sol en el centro del tubo (en los huecos)
+    - Crear un "Sol en el centro del tubo (en los huecos)"
+    - Crear soles para simular estrellas lejanas
     - Crear una luz enganchada al personaje que cambie de color en función de lo que ocurra
+
     - Barras de Vida
     - Marcador de velocidad
     - Indicador de minerales recogidos

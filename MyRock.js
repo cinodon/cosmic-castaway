@@ -30,8 +30,7 @@ class MyRock extends THREE.Object3D {
         color: 0x4AF8FF, // Color del cristal
         transparent: true, // Hacer el material transparente
         opacity: 0.9, // Nivel de transparencia (0 = completamente transparente, 1 = completamente opaco)
-        roughness: 0.2, // Rugosidad del cristal (0 = completamente liso, 1 = muy rugoso)
-        metalness: 0.6, // Metalidad del cristal (0 = no metálico, 1 = completamente metálico)
+        roughness: 0.1, // Rugosidad del cristal (0 = completamente liso, 1 = muy rugoso)
         clearcoat: 1, // Capa transparente adicional para dar brillo al cristal
         clearcoatRoughness: 0.1, // Rugosidad de la capa transparente
         transmission: 0.9, // Transmitancia del material (0 = totalmente opaco, 1 = totalmente transparente)
@@ -42,13 +41,15 @@ class MyRock extends THREE.Object3D {
     else
     {
       texture = textureLoader.load('../imgs/stone-texture.jpg');
+      var textbmap = textureLoader.load('../imgs/stone-bmap.jpg');
       textSettings = {
         transparent: false, // Hacer el material transparente
         opacity: 1, // Nivel de transparencia (0 = completamente transparente, 1 = completamente opaco)
         roughness: 1, // Rugosidad del cristal (0 = completamente liso, 1 = muy rugoso)
         metalness: 0.1, // Metalidad del cristal (0 = no metálico, 1 = completamente metálico)
         transmission: 0, // Transmitancia del material (0 = totalmente opaco, 1 = totalmente transparente)
-        map: texture
+        map: texture,
+        bumpMap: textbmap
       }    
     } 
 
@@ -240,6 +241,7 @@ class MyRock extends THREE.Object3D {
           var mesh = this.mesh.children.find(child => child instanceof THREE.Mesh);
           var textureLoader = new THREE.TextureLoader();
           var texture = textureLoader.load('../imgs/mineraltex-broken.jpg');
+          var textbmap = textureLoader.load('../imgs/stone-bmap.jpg'); 
           var textSettings = {
             color: 0xB3FAFC, // Color del cristal
             transparent: true, // Hacer el material transparente
@@ -250,7 +252,8 @@ class MyRock extends THREE.Object3D {
             clearcoatRoughness: 0.1, // Rugosidad de la capa transparente
             transmission: 0.9, // Transmitancia del material (0 = totalmente opaco, 1 = totalmente transparente)
             ior: 1.5,
-            map: texture
+            map: texture,
+            bumpMap: textbmap, 
           }
           var mat = new THREE.MeshStandardMaterial(textSettings);
           mesh.material = mat;

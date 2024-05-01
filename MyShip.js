@@ -567,7 +567,8 @@ class MyShip extends THREE.Object3D {
       metalness: 0.5,
       roughness: 0.2,
       color: 0xE09437,
-      emissive: 0xFEAE4E,   
+      emissive: 0xFEAE4E,
+      emissiveIntensity: 1,   
       needsUpdate: true   
   });
 
@@ -671,8 +672,9 @@ class MyShip extends THREE.Object3D {
       flatShading: false,              // No usar sombreado plano para obtener transiciones de color suaves
       metalness: 0.5,
       roughness: 0.2,
-      color: 0xE09437,
-      emissive: 0xFEAE4E,   
+      color: 0x4CA6D1,
+      emissive: 0xABFFF5,
+      emissiveIntensity: 1,   
       needsUpdate: true   
   });
 

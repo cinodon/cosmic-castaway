@@ -168,6 +168,87 @@ class MyScene extends THREE.Scene {
     this.createPlayerCamera();
 
 
+
+    //Luces
+    var solarText = new THREE.TextureLoader().load('../imgs/solar-text.jpg');
+    var sphG = new THREE.SphereGeometry(20);
+    var sphM0 = new THREE.MeshBasicMaterial({
+      map:solarText,
+      roughness: 0.2, 
+      metalness: 0.7,
+      transmission: 0.8 
+    });
+    
+    var sun0 = new THREE.Mesh(sphG, sphM0);
+    var sun0_light = new THREE.PointLight(0xFF7416)
+    sun0_light.power = 200000;
+    sun0_light.add(sun0);
+    sun0_light.position.set(0, 100, 100);
+    this.add(sun0_light);
+
+    var sphM1 = new THREE.MeshBasicMaterial({
+      map:solarText,
+      roughness: 0.2, 
+      metalness: 0.7,
+      color: 0x5FFFEC,
+      transmission: 0.8 
+    });
+
+    var sun1 = new THREE.Mesh(sphG, sphM1);
+    var sun1_light = new THREE.PointLight(0x5FFF6D)
+    sun1_light.power = 200000;
+    sun1_light.add(sun1);
+    sun1_light.position.set(200, 100, 200);
+    this.add(sun1_light);
+
+    var sphM2 = new THREE.MeshBasicMaterial({
+      map:solarText,
+      roughness: 0.2, 
+      metalness: 0.7,
+      color: 0xF701FF,
+      transmission: 0.8 
+    });
+
+    var sun2 = new THREE.Mesh(sphG, sphM2);
+    var sun2_light = new THREE.PointLight(0xF701FF);
+    sun2_light.power = 200000;
+    sun2_light.add(sun2);
+    sun2_light.position.set(-200, 100, 0);
+    this.add(sun2_light);
+
+    //Luz de la nave
+    var sphGS = new THREE.SphereGeometry(0.2);
+    var sphMS = new THREE.MeshBasicMaterial({
+      roughness: 0.2, 
+      metalness: 0.7,
+      transmission: 0.8 
+    });
+
+    var sphShip0 = new THREE.Mesh(sphGS, sphMS);
+    var sphShip1 = new THREE.Mesh(sphGS, sphMS);
+    var sphShip2 = new THREE.Mesh(sphGS, sphMS);
+
+    var ship_light0 = new THREE.PointLight(0xF8E79F);
+    ship_light0.power = 200;
+    ship_light0.position.set(0, 0.75, -2.25)
+    ship_light0.add(sphShip0);
+
+    var ship_light1 = new THREE.PointLight(0xF8E79F);
+    ship_light1.power = 100;
+    ship_light1.position.set(1, 0.65, -2.25)
+    ship_light1.add(sphShip1);
+
+    var ship_light2 = new THREE.PointLight(0xF8E79F);
+    ship_light2.power = 100;
+    ship_light2.position.set(-1, 0.65, -2.25)
+    ship_light2.add(sphShip2);
+    
+
+    this.ship.ship.add(ship_light0);
+    this.ship.ship.add(ship_light1);
+    this.ship.ship.add(ship_light2);
+
+
   }
   
   initStats() {
@@ -252,11 +333,14 @@ class MyScene extends THREE.Scene {
 
   // El material se hará con una textura de cráteres
   var text = new THREE.TextureLoader().load('../imgs/crater.jpeg');
+  var nmap = new THREE.TextureLoader().load('../imgs/ground-nmap.jpg');
   var materialGround = new THREE.MeshStandardMaterial({
     color: 0x808080, // Color gris
     roughness: 0.5, // Controla la aspereza de la superficie (valores entre 0 y 1)
-    metalness: 0.2, // Controla la reflectividad metálica de la superficie (valores entre 0 y 1)
-    map: text
+    metalness: 0.1, // Controla la reflectividad metálica de la superficie (valores entre 0 y 1)
+    map: text,
+    normalMap: nmap,
+    normalScale: (1,1)
 });
 
   /*var materialGround = new THREE.MeshStandardMaterial({
