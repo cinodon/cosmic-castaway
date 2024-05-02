@@ -20,6 +20,7 @@ import { MyLaserCannon } from './MyLaserCannon.js'
 import { MyTripleLaser } from './MyTripleLaser.js'
 import { MyMegaRocket } from './MyMegaRocket.js'
 import { MyPrueba } from './MyPrueba.js'
+import { MyDrill } from './MyDrill.js'
 
 
 /// La clase fachada del modelo
@@ -65,18 +66,22 @@ class MyScene extends THREE.Scene {
     //this.add (this.model);
 
     //Nave
-    this.ship = new MyShip(this.gui, "Control de la nave", this.tube);
-    this.add (this.ship);
+    /*this.ship = new MyShip(this.gui, "Control de la nave", this.tube);
+    this.add (this.ship);*/
+
+    this.drill = new MyDrill(this.gui, "Control taladro");
+    this.add(this.drill);
+
 
     //Armas
-    this.weapon0 = new MyLaserCannon(this.gui, "Control del Cañon Láser");
+    /*this.weapon0 = new MyLaserCannon(this.gui, "Control del Cañon Láser");
     this.add (this.weapon0);
 
     this.weapon1 = new MyTripleLaser(this.gui, "Control del Rayo Triple");
     this.add (this.weapon1);
 
     this.weapon2 = new MyMegaRocket(this.gui, "Control del Mega Cañón");
-    this.add (this.weapon2);
+    this.add (this.weapon2);*/
  
   }
   
@@ -279,13 +284,7 @@ class MyScene extends THREE.Scene {
     this.cameraControl.update();
     
     // Se actualiza el resto del modelo
-    //Nave
-    this.ship.update();
-    
-    //Armas
-    this.weapon0.update();
-    this.weapon1.update();
-    this.weapon2.update();
+    this.drill.update();
 
 
 
