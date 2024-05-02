@@ -35,30 +35,38 @@ class MyDrill extends THREE.Object3D {
     var c0 = new THREE.Mesh(cilSG, this.mat);
     var c1 = new THREE.Mesh(cilLG, this.mat);
     var c2 = new THREE.Mesh(cilLG, this.mat);
-    var cone = new THREE.Mesh(conoG, this.mat);
-    var cj0 = new THREE.Mesh(cilJ, this.mat);
-    var cj1 = new THREE.Mesh(cilJ, this.mat);
+    this.cone = new THREE.Mesh(conoG, this.mat);
+    this.cj0 = new THREE.Mesh(cilJ, this.mat);
+    this.cj1 = new THREE.Mesh(cilJ, this.mat);
 
     
-    c0.add(cj0);
-    cj0.add(c1)
-    cj0.position.y = jr + s;
+    c0.add(this.cj0);
+    this.cj0.add(c1)
+    this.cj0.position.y = jr + s;
     c1.position.y = jr;
     //cj0.rotateZ(Math.PI/2)
-    c1.add(cj1);
-    cj1.position.y = l + jr;
-    cj1.add(c2);
+    c1.add(this.cj1);
+    this.cj1.position.y = l + jr;
+    this.cj1.add(c2);
     c2.position.y = jr;
-    c2.add(cone);
-    cone.position.y = l;
+    c2.add(this.cone);
+    this.cone.position.y = l;
     
-    
+    //Animation
+    this.animDir = 1;
+    var animFrames = 100;
+    this.cj0Init = -1.24;
+    this.cj0End = Math.PI/2;
+    this.inc0 = (this.cj0End-this.cj0Init)/animFrames;
 
-    
+    this.cj1Init = 2.65;
+    this.cj1End = 0;
+    this.inc1 = -(this.cj1Init/animFrames);
 
+    this.cj0.rotateZ(this.cj0Init);
+    this.cj1.rotateZ(this.cj1Init);
 
-    
-
+    c0.rotateY(Math.PI/2);
     this.add(c0);
   }
   
@@ -95,32 +103,33 @@ class MyDrill extends THREE.Object3D {
   createGUI (gui,titleGui) {
     // Controles para el tamaño, la orientación y la posición de la caja
     this.guiControls = {
-      sizeX : 1.0,
-      sizeY : 1.0,
-      sizeZ : 1.0,
-      
       rotX : 0.0,
       rotY : 0.0,
-      rotZ : 0.0,
+      rotZ : 0.65,
       
-      posX : 0.0,
-      posY : 0.0,
-      posZ : 0.0,
+      rotX0 : 0.0,
+      rotY0 : 0.0,
+      rotZ0 : -1.24,
       
+      rotX1 : 0.0,
+      rotY1 : 0.0,
+      rotZ1 : 2.65,
       // Un botón para dejarlo todo en su posición inicial
       // Cuando se pulse se ejecutará esta función.
       reset : () => {
-        this.guiControls.sizeX = 1.0;
-        this.guiControls.sizeY = 1.0;
-        this.guiControls.sizeZ = 1.0;
-        
         this.guiControls.rotX = 0.0;
         this.guiControls.rotY = 0.0;
         this.guiControls.rotZ = 0.0;
+
+        this.guiControls.rotX0 = 0.0;
+        this.guiControls.rotY0 = 0.0;
+        this.guiControls.rotZ0 = -1.24;
+
         
-        this.guiControls.posX = 0.0;
-        this.guiControls.posY = 0.0;
-        this.guiControls.posZ = 0.0;
+        this.guiControls.rotX1 = 0.0;
+        this.guiControls.rotY1 = 0.0;
+        this.guiControls.rotZ1 = 2.65;
+        
       }
     } 
     
@@ -129,21 +138,27 @@ class MyDrill extends THREE.Object3D {
     // Estas lineas son las que añaden los componentes de la interfaz
     // Las tres cifras indican un valor mínimo, un máximo y el incremento
     // El método   listen()   permite que si se cambia el valor de la variable en código, el deslizador de la interfaz se actualice
-    folder.add (this.guiControls, 'sizeX', 0.1, 5.0, 0.01).name ('Tamaño X : ').listen();
-    folder.add (this.guiControls, 'sizeY', 0.1, 5.0, 0.01).name ('Tamaño Y : ').listen();
-    folder.add (this.guiControls, 'sizeZ', 0.1, 5.0, 0.01).name ('Tamaño Z : ').listen();
-    
     folder.add (this.guiControls, 'rotX', 0.0, Math.PI*2, 0.01).name ('Rotación X : ').listen();
     folder.add (this.guiControls, 'rotY', 0.0, Math.PI*2, 0.01).name ('Rotación Y : ').listen();
     folder.add (this.guiControls, 'rotZ', 0.0, Math.PI*2, 0.01).name ('Rotación Z : ').listen();
-    
-    folder.add (this.guiControls, 'posX', -20.0, 20.0, 0.01).name ('Posición X : ').listen();
-    folder.add (this.guiControls, 'posY', 0.0, 10.0, 0.01).name ('Posición Y : ').listen();
-    folder.add (this.guiControls, 'posZ', -20.0, 20.0, 0.01).name ('Posición Z : ').listen();
-    
+    folder.add (this.guiControls, 'rotX0', 0.0, Math.PI*2, 0.01).name ('Rotación X : ').listen();
+    folder.add (this.guiControls, 'rotY0', 0.0, Math.PI*2, 0.01).name ('Rotación Y : ').listen();
+    folder.add (this.guiControls, 'rotZ0', -1.24, Math.PI/2, 0.01).name ('Rotación Z : ').listen();
+    folder.add (this.guiControls, 'rotX1', 0.0, Math.PI*2, 0.01).name ('Rotación X : ').listen();
+    folder.add (this.guiControls, 'rotY1', 0.0, Math.PI*2, 0.01).name ('Rotación Y : ').listen();
+    folder.add (this.guiControls, 'rotZ1', 0.0, 2.65, 0.01).name ('Rotación Z : ').listen();
+    //-1.24
     folder.add (this.guiControls, 'reset').name ('[ Reset ]');
   }
   
+  anim()
+  {
+    this.cj0.rotation.z += this.inc0*this.animDir;
+    this.cj1.rotation.z += this.inc1*this.animDir;
+
+    if ((this.cj1.rotation.z <= this.cj1End) || (this.cj1.rotation.z >= this.cj1Init)) this.animDir *= -1;
+  }
+
   update () {
     // Con independencia de cómo se escriban las 3 siguientes líneas, el orden en el que se aplican las transformaciones es:
     // Primero, el escalado
@@ -151,10 +166,14 @@ class MyDrill extends THREE.Object3D {
     // Después, la rotación en Y
     // Luego, la rotación en X
     // Y por último la traslación
-   
-    this.position.set (this.guiControls.posX,this.guiControls.posY,this.guiControls.posZ);
-    this.rotation.set (this.guiControls.rotX,this.guiControls.rotY,this.guiControls.rotZ);
-    this.scale.set (this.guiControls.sizeX,this.guiControls.sizeY,this.guiControls.sizeZ);
+
+    this.rotation.set (this.guiControls.rotX, this.guiControls.rotY, this.guiControls.rotZ);
+    //this.cj0.rotation.set(this.guiControls.rotX0, this.guiControls.rotY0, this.guiControls.rotZ0);
+    //this.cj1.rotation.set(this.guiControls.rotX1, this.guiControls.rotY1, this.guiControls.rotZ1);
+    this.cone.rotation.y += 0.1;
+    this.anim();
+
+
   }
 }
 
