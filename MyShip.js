@@ -36,6 +36,11 @@ class MyShip extends THREE.Object3D {
     //HIT PROPERTIES
     this.initHitProperties();
 
+    //Luces
+    this.createLights();
+    this.light_current_color = this.ship_light0.color;
+    this.light_val = 0;
+
     //Nodo - Rotación - Movimiento lateral
     this.nodoRot = new THREE.Object3D();
     this.nodoRot.add(this.ship);
@@ -126,6 +131,41 @@ class MyShip extends THREE.Object3D {
     this.HITREPS_TOTAL = 6;
     this.color_val = 0;
     this.color_inc = 1/6;
+  }
+
+  createLights()
+  {
+    //Luz de la nave
+    var sphGS = new THREE.SphereGeometry(0.2);
+    var sphMS = new THREE.MeshBasicMaterial({
+      roughness: 0.2, 
+      metalness: 0.7,
+      transmission: 0.8 
+    });
+
+    var sphShip0 = new THREE.Mesh(sphGS, sphMS);
+    var sphShip1 = new THREE.Mesh(sphGS, sphMS);
+    var sphShip2 = new THREE.Mesh(sphGS, sphMS);
+
+    this.ship_light0 = new THREE.PointLight(0xF8E79F);
+    this.ship_light0.power = 200;
+    this.ship_light0.position.set(0, 0.75, -2.25)
+    this.ship_light0.add(sphShip0);
+
+    this.ship_light1 = new THREE.PointLight(0xF8E79F);
+    this.ship_light1.power = 100;
+    this.ship_light1.position.set(1, 0.65, -2.25)
+    this.ship_light1.add(sphShip1);
+
+    this.ship_light2 = new THREE.PointLight(0xF8E79F);
+    this.ship_light2.power = 100;
+    this.ship_light2.position.set(-1, 0.65, -2.25)
+    this.ship_light2.add(sphShip2);
+    
+
+    this.ship.add(this.ship_light0);
+    this.ship.add(this.ship_light1);
+    this.ship.add(this.ship_light2);
   }
 //----------------------------------------------------------------------
   //Creación de geometría
@@ -907,6 +947,12 @@ class MyShip extends THREE.Object3D {
   {
     this.mineral++;
     console.log("MINERAL: ", this.mineral);
+      //Cambiar de color las luces
+      this.ship_light0.color.setHex(0x05E0FD);
+      this.ship_light1.color.setHex(0x05E0FD);
+      this.ship_light2.color.setHex(0x05E0FD);
+      this.light_current_color = this.ship_light0.color;
+      this.light_val = 0;
   }
 
   hit(value)
@@ -920,6 +966,13 @@ class MyShip extends THREE.Object3D {
 
       //Llamar animación de daño
       this.invulnerable = true;
+
+      //Cambiar de color las luces
+      this.ship_light0.color.setHex(0xFD0505);
+      this.ship_light1.color.setHex(0xFD0505);
+      this.ship_light2.color.setHex(0xFD0505);
+      this.light_current_color = this.ship_light0.color;
+      this.light_val = 0;
     }
   }
 
@@ -928,6 +981,14 @@ class MyShip extends THREE.Object3D {
     if (this.vida < this.VIDA_MAX) this.vida += 5;
     this.spd = this.spd + this.inc_spd
     console.log("ARMAZON REPARADO > ", this.vida);
+
+    //Cambiar de color las luces
+    this.ship_light0.color.setHex(0x05FD3F);
+    this.ship_light1.color.setHex(0x05FD3F);
+    this.ship_light2.color.setHex(0x05FD3F);
+    this.light_current_color = this.ship_light0.color;
+    this.light_val = 0;
+
   }
 
   hitAnim()
@@ -939,13 +1000,32 @@ class MyShip extends THREE.Object3D {
       this.hitRpt++;
     }
 
+    //Final de animación
     if (this.hitRpt == this.HITREPS_TOTAL)
     {
       this.invulnerable = false;
       this.hitRpt = 0;
       this.ship.position.y = this.basePos;
       this.spd = this.spd + this.inc_spd; //Recupera un poco la velocidad anterior
+
+      //Cambiar de color las luces
+      /*this.ship_light0.color.setHex(0xF8E79F);
+      this.ship_light1.color.setHex(0xF8E79F);
+      this.ship_light2.color.setHex(0xF8E79F);*/
+      //this.light_val = 0;
     }
+  }
+
+  colorAnim()
+  {
+    var color = new THREE.Color();
+    var color2 = new THREE.Color(0xF8E79F);
+    color.lerpColors(this.light_current_color, color2, this.light_val);
+    if (this.light_val < 1) this.light_val += 0.015; 
+
+    this.ship_light0.color.setHex(color.getHex());
+    this.ship_light1.color.setHex(color.getHex());
+    this.ship_light2.color.setHex(color.getHex());
   }
 
   update () {
@@ -971,6 +1051,9 @@ class MyShip extends THREE.Object3D {
 
     //Animación de recibir daño
     if (this.invulnerable == true) this.hitAnim();
+
+    //Volver luces a la normalidad
+    if (this.ship_light0.color.getHex() != 0xF8E79F) this.colorAnim();
   }
 }
 

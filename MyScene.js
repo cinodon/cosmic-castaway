@@ -216,37 +216,7 @@ class MyScene extends THREE.Scene {
     sun2_light.position.set(-200, 100, 0);
     this.add(sun2_light);
 
-    //Luz de la nave
-    var sphGS = new THREE.SphereGeometry(0.2);
-    var sphMS = new THREE.MeshBasicMaterial({
-      roughness: 0.2, 
-      metalness: 0.7,
-      transmission: 0.8 
-    });
-
-    var sphShip0 = new THREE.Mesh(sphGS, sphMS);
-    var sphShip1 = new THREE.Mesh(sphGS, sphMS);
-    var sphShip2 = new THREE.Mesh(sphGS, sphMS);
-
-    var ship_light0 = new THREE.PointLight(0xF8E79F);
-    ship_light0.power = 200;
-    ship_light0.position.set(0, 0.75, -2.25)
-    ship_light0.add(sphShip0);
-
-    var ship_light1 = new THREE.PointLight(0xF8E79F);
-    ship_light1.power = 100;
-    ship_light1.position.set(1, 0.65, -2.25)
-    ship_light1.add(sphShip1);
-
-    var ship_light2 = new THREE.PointLight(0xF8E79F);
-    ship_light2.power = 100;
-    ship_light2.position.set(-1, 0.65, -2.25)
-    ship_light2.add(sphShip2);
     
-
-    this.ship.ship.add(ship_light0);
-    this.ship.ship.add(ship_light1);
-    this.ship.ship.add(ship_light2);
 
 
   }
