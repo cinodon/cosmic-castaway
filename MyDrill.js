@@ -68,6 +68,7 @@ class MyDrill extends THREE.Object3D {
 
     c0.rotateY(Math.PI/2);
     this.add(c0);
+    //-0.2, 0.4, 1.5
   }
   
   createBox()
@@ -103,6 +104,10 @@ class MyDrill extends THREE.Object3D {
   createGUI (gui,titleGui) {
     // Controles para el tamaño, la orientación y la posición de la caja
     this.guiControls = {
+      posX : 0.0,
+      posY : 0.0,
+      posZ : 0.0,
+
       rotX : 0.0,
       rotY : 0.0,
       rotZ : 0.65,
@@ -117,6 +122,10 @@ class MyDrill extends THREE.Object3D {
       // Un botón para dejarlo todo en su posición inicial
       // Cuando se pulse se ejecutará esta función.
       reset : () => {
+        this.guiControls.posX = 0.0;
+        this.guiControls.posY = 0.0;
+        this.guiControls.posZ = 0.0;
+
         this.guiControls.rotX = 0.0;
         this.guiControls.rotY = 0.0;
         this.guiControls.rotZ = 0.0;
@@ -138,6 +147,9 @@ class MyDrill extends THREE.Object3D {
     // Estas lineas son las que añaden los componentes de la interfaz
     // Las tres cifras indican un valor mínimo, un máximo y el incremento
     // El método   listen()   permite que si se cambia el valor de la variable en código, el deslizador de la interfaz se actualice
+    folder.add (this.guiControls, 'posX', -10.0, 10, 0.01).name ('Rotación X : ').listen();
+    folder.add (this.guiControls, 'posY', -10.0, 10, 0.01).name ('Rotación Y : ').listen();
+    folder.add (this.guiControls, 'posZ', -10.0, 10, 0.01).name ('Rotación Z : ').listen();
     folder.add (this.guiControls, 'rotX', 0.0, Math.PI*2, 0.01).name ('Rotación X : ').listen();
     folder.add (this.guiControls, 'rotY', 0.0, Math.PI*2, 0.01).name ('Rotación Y : ').listen();
     folder.add (this.guiControls, 'rotZ', 0.0, Math.PI*2, 0.01).name ('Rotación Z : ').listen();
@@ -166,7 +178,7 @@ class MyDrill extends THREE.Object3D {
     // Después, la rotación en Y
     // Luego, la rotación en X
     // Y por último la traslación
-
+    this.position.set (this.guiControls.posX, this.guiControls.posY, this.guiControls.posZ);
     this.rotation.set (this.guiControls.rotX, this.guiControls.rotY, this.guiControls.rotZ);
     //this.cj0.rotation.set(this.guiControls.rotX0, this.guiControls.rotY0, this.guiControls.rotZ0);
     //this.cj1.rotation.set(this.guiControls.rotX1, this.guiControls.rotY1, this.guiControls.rotZ1);
