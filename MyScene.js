@@ -15,6 +15,7 @@ import { MyBox } from './MyBox.js'
 import { MyBoxHelix } from './MyBoxHelix.js'
 import { MyRock } from './MyRock.js'
 import { MyPirate } from './MyPirate.js'
+import { MyShot } from './MyShot.js'
 
 
 
@@ -477,7 +478,16 @@ class MyScene extends THREE.Scene {
           picked.userData.shot(this.ship, this);
         }  
       }
+    }
 
+    //Disparo de la nave - Botón derecho
+    if (x == 3)
+    {
+      //Creamos el objeto disparo
+      var shot = new MyShot(this.gui, "Disparo "+ this.ship.t, this.tube.geometry, this.ship.angle, this.ship.t);
+
+      this.shots.push(shot);
+      this.add(shot);
     }
   }
 
@@ -548,6 +558,11 @@ class MyScene extends THREE.Scene {
 
   }
 
+  shotCollision()
+  {
+    
+  }
+
   update () {
     
     if (this.stats) this.stats.update();
@@ -592,9 +607,30 @@ class MyScene extends THREE.Scene {
       this.gear[i].update();
     }
 
+    let shotsRemoved = [];
+    for(let i = 0; i < this.shots.length; i++)
+    {
+      this.shots[i].update();
+      if (this.shots[i].totalD >= this.shots[i].end)
+      {
+        shotsRemoved.push(this.shots[i]);
+      }
+    }
+
+    // Removemos los objetos a eliminar de la escena y del array
+    for (let i = 0; i < shotsRemoved.length; i++) {
+      this.remove(shotsRemoved[i]);
+      let index = this.shots.indexOf(shotsRemoved[i]);
+      if (index !== -1) {
+          this.shots.splice(index, 1);
+      }
+    }
+
     //Colisiones
     this.checkCollision();
     
+    //Comprobar colisiones de los disparos
+    this.shotCollision();
     
     // Le decimos al renderizador "visualiza la escena que te indico usando la cámara que te estoy pasando"
     this.renderer.render (this, this.getCamera());
