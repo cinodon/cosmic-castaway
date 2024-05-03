@@ -154,17 +154,17 @@ class MyShip extends THREE.Object3D {
     var sphShip2 = new THREE.Mesh(sphGS, sphMS);
 
     this.ship_light0 = new THREE.PointLight(0xF8E79F);
-    this.ship_light0.power = 200;
+    this.ship_light0.power = 100;
     this.ship_light0.position.set(0, 0.75, -2.25)
     this.ship_light0.add(sphShip0);
 
     this.ship_light1 = new THREE.PointLight(0xF8E79F);
-    this.ship_light1.power = 100;
+    this.ship_light1.power = 50;
     this.ship_light1.position.set(1, 0.65, -2.25)
     this.ship_light1.add(sphShip1);
 
     this.ship_light2 = new THREE.PointLight(0xF8E79F);
-    this.ship_light2.power = 100;
+    this.ship_light2.power = 50;
     this.ship_light2.position.set(-1, 0.65, -2.25)
     this.ship_light2.add(sphShip2);
     
@@ -281,9 +281,11 @@ class MyShip extends THREE.Object3D {
     //Materiales
     var textureLoader = new THREE.TextureLoader();
     var texture = textureLoader.load('../imgs/rusty-metal.jpg');
-    var rusty_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
+    var textB = textureLoader.load('../imgs/metal-bmap.jpg');
+    var textN = textureLoader.load('../imgs/metal-nmap.jpg');
+    var rusty_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5, normalMap:textN, bumpMap:textB });
     texture = textureLoader.load('../imgs/red-metal.jpeg');
-    var red_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
+    var red_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5, normalMap:textN, bumpMap:textB });
     
 
     //Parte trasera
@@ -392,8 +394,10 @@ class MyShip extends THREE.Object3D {
   {
     //Materials
     var textureLoader = new THREE.TextureLoader();
+    var textB = textureLoader.load('../imgs/metal-bmap.jpg');
+    var textN = textureLoader.load('../imgs/metal-nmap.jpg');
     var texture = textureLoader.load('../imgs/red-metal.jpeg');
-    var red_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
+    var red_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5, normalMap:textN, bumpMap:textB });
     var texture = textureLoader.load('../imgs/weapon-tex.jpg');
     var metal_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
 
@@ -503,10 +507,12 @@ class MyShip extends THREE.Object3D {
 
     //Material
     var textureLoader = new THREE.TextureLoader();
+    var textB = textureLoader.load('../imgs/metal-bmap.jpg');
+    var textN = textureLoader.load('../imgs/metal-nmap.jpg');
     var texture = textureLoader.load('../imgs/black_leather.jpeg');
     var seat_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
     var texture = textureLoader.load('../imgs/rusty-metal.jpg');
-    var plate_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
+    var plate_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5, normalMap:textN, bumpMap:textB });
 
 
     //Partes

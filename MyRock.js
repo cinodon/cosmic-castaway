@@ -78,7 +78,7 @@ class MyRock extends THREE.Object3D {
     this.crystal.position.y = this.radio + 1.5;
     this.crystal.scale.set(this.crystal.scale.x*3, this.crystal.scale.y*3, this.crystal.scale.z*3)
     this.mesh.position.y = this.radio - 0.4;
-    this.mesh.scale.set(this.mesh.scale.x*3, this.mesh.scale.y*3, this.mesh.scale.z*3)
+    this.mesh.scale.set(this.mesh.scale.x*5, this.mesh.scale.y*5, this.mesh.scale.z*5)
 
     //Rotación
     this.nodoRot = new THREE.Object3D();

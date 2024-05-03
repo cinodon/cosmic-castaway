@@ -65,18 +65,11 @@ class MyScene extends THREE.Scene {
     this.ship = new MyShip(this.gui, "Control de la nave", this.tube.geometry);
     this.add (this.ship);
 
-    var cubeG = new THREE.BoxGeometry();
-    var textN = new THREE.TextureLoader().load('../imgs/ground-nmap.jpg');
-    var textB = new THREE.TextureLoader().load('../imgs/stone-bmap.jpg');
-    var text = new THREE.TextureLoader().load('../imgs/stone-texture.jpg');
-    var mat = new THREE.MeshStandardMaterial({map: text, normalMap: textN, bumpMap: textB});
-    var rockT = new MyRock(this.gui, "Roca Text", false, this.tube.geometry, a, p)
-    this.add(rock);
-
 //Creación de objetos en el tubo
 //------------------------------------------------------------------------------------
     this.pickables = [];
     this.collisions = [];
+    this.shots = [];
     //Rocas
     var nrocks = 40;
     this.rock = [];
@@ -259,13 +252,15 @@ class MyScene extends THREE.Scene {
   // El material se hará con una textura de cráteres
   var text = new THREE.TextureLoader().load('../imgs/crater.jpeg');
   var nmap = new THREE.TextureLoader().load('../imgs/ground-nmap.jpg');
+  var bmap = new THREE.TextureLoader().load('../imgs/stone-bmap.jpg');
   var materialGround = new THREE.MeshStandardMaterial({
     color: 0x808080, // Color gris
-    roughness: 0.5, // Controla la aspereza de la superficie (valores entre 0 y 1)
+    roughness: 1, // Controla la aspereza de la superficie (valores entre 0 y 1)
     metalness: 0.1, // Controla la reflectividad metálica de la superficie (valores entre 0 y 1)
     map: text,
     normalMap: nmap,
-    normalScale: (1,1)
+    bumpMap: bmap
+
 });
 
   /*var materialGround = new THREE.MeshStandardMaterial({
