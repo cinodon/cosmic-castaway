@@ -4,7 +4,7 @@ import { CSG } from '../libs/CSG-v2.js'
 import { MyCrystal } from './MyCrystal.js';
  
 class MyRock extends THREE.Object3D {
-  constructor(gui,titleGui, isCrystal, geomTubo, angle, pos) {
+  constructor(gui,titleGui, isCrystal, geomTubo, angle, pos, inTube) {
     super();
     
     // Se crea la parte de la interfaz que corresponde a la caja
@@ -88,19 +88,22 @@ class MyRock extends THREE.Object3D {
     this.nodoPosTubo = new THREE.Object3D();
     this.nodoPosTubo.add(this.nodoRot);
 
-    //Colocar rotación
-    this.nodoRot.rotation.z = angle
+    if (inTube)
+    {
+      //Colocar rotación
+      this.nodoRot.rotation.z = angle
 
-    //Posicionar
-    var posTmp = this.path.getPointAt (pos);
-    this.nodoPosTubo.position.copy(posTmp);
+      //Posicionar
+      var posTmp = this.path.getPointAt (pos);
+      this.nodoPosTubo.position.copy(posTmp);
 
-    //Orientación
-    var tangente = this.path.getTangentAt(pos);
-    posTmp.add(tangente);
-    var segmentoActual = Math.floor(pos * this.segmentos);
-    this.nodoPosTubo.up = this.tubo.binormals[segmentoActual];
-    this.nodoPosTubo.lookAt (posTmp);
+      //Orientación
+      var tangente = this.path.getTangentAt(pos);
+      posTmp.add(tangente);
+      var segmentoActual = Math.floor(pos * this.segmentos);
+      this.nodoPosTubo.up = this.tubo.binormals[segmentoActual];
+      this.nodoPosTubo.lookAt (posTmp);
+    }
 
     this.add(this.nodoPosTubo)
   }

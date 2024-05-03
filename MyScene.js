@@ -65,12 +65,10 @@ class MyScene extends THREE.Scene {
     //this.model = new MyPirate(this.gui, "Control del cristal", '../imgs/rusty-metal.jpg');
     //this.add (this.model);
 
-    //Nave
-    this.ship = new MyShip(this.gui, "Control de la nave", this.tube);
-    this.add (this.ship);
+    //Roca
+    this.rock = new MyRock(this.gui, "Roca", false, this.tube.geometry, 0, 0, false);
+    this.add(this.rock);
 
-    this.drill = new MyDrill(this.gui, "Control taladro");
-    this.add(this.drill);
 
 
     //Armas
@@ -284,7 +282,7 @@ class MyScene extends THREE.Scene {
     this.cameraControl.update();
     
     // Se actualiza el resto del modelo
-    this.drill.update();
+    //this.drill.update();
 
 
 
