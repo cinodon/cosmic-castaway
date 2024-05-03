@@ -3,7 +3,7 @@ import * as THREE from '../libs/three.module.js'
 import { CSG } from '../libs/CSG-v2.js'
 
 class MyShot extends THREE.Object3D {
-  constructor(gui,titleGui, geomTubo, angle, pos) {
+  constructor(gui,titleGui, geomTubo, angle, pos, spd) {
     super();
     
     // Se crea la parte de la interfaz que corresponde a la caja
@@ -23,9 +23,9 @@ class MyShot extends THREE.Object3D {
     //Para controlar espacio, tiempo y velocidad
     this.t = pos; //Posición longitudinal - 0 origen
     this.totalD = pos;
-    this.end = pos + 0.2;
+    this.end = pos + 0.1;
     var timeTotal = 25; //Tiempo total del circuito en segundos
-    this.spd = 1/timeTotal; //Velocidad
+    this.spd = spd*2; //Velocidad
     //---------------------------------------------------------
     //Reloj
     this.clock = new THREE.Clock();

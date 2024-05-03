@@ -484,7 +484,7 @@ class MyScene extends THREE.Scene {
     if (x == 3)
     {
       //Creamos el objeto disparo
-      var shot = new MyShot(this.gui, "Disparo "+ this.ship.t, this.tube.geometry, this.ship.angle, this.ship.t);
+      var shot = new MyShot(this.gui, "Disparo "+ this.ship.t, this.tube.geometry, this.ship.angle, this.ship.t, this.ship.spd);
 
       this.shots.push(shot);
       this.add(shot);
