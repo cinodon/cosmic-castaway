@@ -15,3 +15,5 @@ PIRATA
 --Trayectoria que sigue
 --disparos
 -----------------------
+
+NOTAS para el fondo

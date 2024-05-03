@@ -168,6 +168,15 @@ class MyScene extends THREE.Scene {
     //Creacion de la cámara la del player
     this.createPlayerCamera();
     
+    //Background
+    var textPath = ['./imgs/space-background.jpg',
+                     './imgs/space-background.jpg',
+                      './imgs/space-background.jpg',
+                      './imgs/space-background.jpg',
+                      './imgs/space-background.jpg',
+                      './imgs/space-background.jpg'];
+    var text = new THREE.CubeTextureLoader().load(textPath);
+    this.background = text;
   }
   
   initStats() {
