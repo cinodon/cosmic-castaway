@@ -65,6 +65,13 @@ class MyScene extends THREE.Scene {
     this.ship = new MyShip(this.gui, "Control de la nave", this.tube.geometry);
     this.add (this.ship);
 
+    var cubeG = new THREE.BoxGeometry();
+    var textN = new THREE.TextureLoader().load('../imgs/ground-nmap.jpg');
+    var textB = new THREE.TextureLoader().load('../imgs/stone-bmap.jpg');
+    var text = new THREE.TextureLoader().load('../imgs/stone-texture.jpg');
+    var mat = new THREE.MeshStandardMaterial({map: text, normalMap: textN, bumpMap: textB});
+    var rockT = new MyRock(this.gui, "Roca Text", false, this.tube.geometry, a, p)
+    this.add(rock);
 
 //Creación de objetos en el tubo
 //------------------------------------------------------------------------------------
@@ -166,59 +173,7 @@ class MyScene extends THREE.Scene {
 
     //Creacion de la cámara la del player
     this.createPlayerCamera();
-
-
-
-    //Luces
-    var solarText = new THREE.TextureLoader().load('../imgs/solar-text.jpg');
-    var sphG = new THREE.SphereGeometry(20);
-    var sphM0 = new THREE.MeshBasicMaterial({
-      map:solarText,
-      roughness: 0.2, 
-      metalness: 0.7,
-      transmission: 0.8 
-    });
     
-    var sun0 = new THREE.Mesh(sphG, sphM0);
-    var sun0_light = new THREE.PointLight(0xFF7416)
-    sun0_light.power = 200000;
-    sun0_light.add(sun0);
-    sun0_light.position.set(0, 100, 100);
-    this.add(sun0_light);
-
-    var sphM1 = new THREE.MeshBasicMaterial({
-      map:solarText,
-      roughness: 0.2, 
-      metalness: 0.7,
-      color: 0x5FFFEC,
-      transmission: 0.8 
-    });
-
-    var sun1 = new THREE.Mesh(sphG, sphM1);
-    var sun1_light = new THREE.PointLight(0x5FFF6D)
-    sun1_light.power = 200000;
-    sun1_light.add(sun1);
-    sun1_light.position.set(200, 100, 200);
-    this.add(sun1_light);
-
-    var sphM2 = new THREE.MeshBasicMaterial({
-      map:solarText,
-      roughness: 0.2, 
-      metalness: 0.7,
-      color: 0xF701FF,
-      transmission: 0.8 
-    });
-
-    var sun2 = new THREE.Mesh(sphG, sphM2);
-    var sun2_light = new THREE.PointLight(0xF701FF);
-    sun2_light.power = 200000;
-    sun2_light.add(sun2);
-    sun2_light.position.set(-200, 100, 0);
-    this.add(sun2_light);
-
-    
-
-
   }
   
   initStats() {
@@ -381,14 +336,52 @@ class MyScene extends THREE.Scene {
     // La añadimos a la escena
     this.add (this.ambientLight);
     
-    // Se crea una luz focal que va a ser la luz principal de la escena
-    // La luz focal, además tiene una posición, y un punto de mira
-    // Si no se le da punto de mira, apuntará al (0,0,0) en coordenadas del mundo
-    // En este caso se declara como   this.atributo   para que sea un atributo accesible desde otros métodos.
-    this.pointLight = new THREE.PointLight( 0xffffff );
-    this.pointLight.power = this.guiControls.lightPower;
-    this.pointLight.position.set( 2, 3, 1 );
-    this.add (this.pointLight);
+    //Luces añadidas
+    var solarText = new THREE.TextureLoader().load('../imgs/solar-text.jpg');
+    var sphG = new THREE.SphereGeometry(20);
+    var sphM0 = new THREE.MeshBasicMaterial({
+      map:solarText,
+      roughness: 0.2, 
+      metalness: 0.7,
+      transmission: 0.8 
+    });
+    
+    var sun0 = new THREE.Mesh(sphG, sphM0);
+    var sun0_light = new THREE.PointLight(0xFF7416)
+    sun0_light.power = 200000;
+    sun0_light.add(sun0);
+    sun0_light.position.set(0, 100, 100);
+    this.add(sun0_light);
+
+    var sphM1 = new THREE.MeshBasicMaterial({
+      map:solarText,
+      roughness: 0.2, 
+      metalness: 0.7,
+      color: 0x5FFFEC,
+      transmission: 0.8 
+    });
+
+    var sun1 = new THREE.Mesh(sphG, sphM1);
+    var sun1_light = new THREE.PointLight(0x5FFF6D)
+    sun1_light.power = 200000;
+    sun1_light.add(sun1);
+    sun1_light.position.set(200, 100, 200);
+    this.add(sun1_light);
+
+    var sphM2 = new THREE.MeshBasicMaterial({
+      map:solarText,
+      roughness: 0.2, 
+      metalness: 0.7,
+      color: 0xF701FF,
+      transmission: 0.8 
+    });
+
+    var sun2 = new THREE.Mesh(sphG, sphM2);
+    var sun2_light = new THREE.PointLight(0xF701FF);
+    sun2_light.power = 200000;
+    sun2_light.add(sun2);
+    sun2_light.position.set(-200, 100, 0);
+    this.add(sun2_light);
   }
   
   setLightPower (valor) {

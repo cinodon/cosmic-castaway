@@ -40,16 +40,18 @@ class MyRock extends THREE.Object3D {
     }
     else
     {
-      texture = textureLoader.load('../imgs/stone-texture.jpg');
-      var textbmap = textureLoader.load('../imgs/stone-bmap.jpg');
+      var textN = new THREE.TextureLoader().load('../imgs/ground-nmap.jpg');
+      var textB = new THREE.TextureLoader().load('../imgs/stone-bmap.jpg');
+      var text = new THREE.TextureLoader().load('../imgs/stone-texture.jpg');
       textSettings = {
         transparent: false, // Hacer el material transparente
         opacity: 1, // Nivel de transparencia (0 = completamente transparente, 1 = completamente opaco)
         roughness: 1, // Rugosidad del cristal (0 = completamente liso, 1 = muy rugoso)
         metalness: 0.1, // Metalidad del cristal (0 = no metálico, 1 = completamente metálico)
         transmission: 0, // Transmitancia del material (0 = totalmente opaco, 1 = totalmente transparente)
-        map: texture,
-        bumpMap: textbmap
+        map: text,
+        bumpMap: textB,
+        normalMap: textN
       }    
     } 
 

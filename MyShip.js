@@ -36,6 +36,12 @@ class MyShip extends THREE.Object3D {
     //HIT PROPERTIES
     this.initHitProperties();
 
+    //Objeto animado --> Taladro
+    this.drill = this.createDrill();
+    this.drill.rotateZ(0.65);
+    this.drill.position.set(-0.2, 0.4, 1.5);
+    this.ship.add(this.drill);
+
     //Luces
     this.createLights();
     this.light_current_color = this.ship_light0.color;
@@ -170,6 +176,73 @@ class MyShip extends THREE.Object3D {
 //----------------------------------------------------------------------
   //Creación de geometría
 //----------------------------------------------------------------------
+  createDrill()
+  {
+    //Drill mat
+    var textureLoader = new THREE.TextureLoader();
+    var texture = textureLoader.load('../imgs/rusty-metal.jpg');
+    var drillPartMat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
+    texture = textureLoader.load('../imgs/drill-text.jpg');
+    var drillMat = new THREE.MeshStandardMaterial( {map: texture, flatShading: false, needsUpdate: true, metalness: 1 });
+
+    var drill = new THREE.Object3D();
+    var l = 0.25;
+    var rl = 0.025;
+    var s = 0.15;
+    var jw = rl*2 + 0.005;
+    var jr = 0.05;
+    var cr = 0.1;
+    var ch = 0.5; 
+    var cilLG = new THREE.CylinderGeometry(rl, rl, l);
+    var cilSG = new THREE.CylinderGeometry(rl, rl, s);
+    var cilJ = new THREE.CylinderGeometry(jr, jr, jw);
+    var conoG = new THREE.ConeGeometry(cr, ch);
+    cilLG.translate(0, l/2, 0);
+    cilSG.translate(0, s/2, 0);
+    cilJ.rotateX(Math.PI/2);
+    conoG.translate(0, ch/2, 0)
+
+
+    var c0 = new THREE.Mesh(cilSG, drillPartMat);
+    var c1 = new THREE.Mesh(cilLG, drillPartMat);
+    var c2 = new THREE.Mesh(cilLG, drillPartMat);
+    this.cone = new THREE.Mesh(conoG, drillMat);
+    this.cj0 = new THREE.Mesh(cilJ, drillPartMat);
+    this.cj1 = new THREE.Mesh(cilJ, drillPartMat);
+
+    
+    c0.add(this.cj0);
+    this.cj0.add(c1)
+    this.cj0.position.y = jr + s;
+    c1.position.y = jr;
+    //cj0.rotateZ(Math.PI/2)
+    c1.add(this.cj1);
+    this.cj1.position.y = l + jr;
+    this.cj1.add(c2);
+    c2.position.y = jr;
+    c2.add(this.cone);
+    this.cone.position.y = l;
+    
+    //Animation
+    this.animDir = 1;
+    var animFrames = 100;
+    this.cj0Init = -1.24;
+    this.cj0End = Math.PI/2;
+    this.inc0 = (this.cj0End-this.cj0Init)/animFrames;
+
+    this.cj1Init = 2.65;
+    this.cj1End = 0;
+    this.inc1 = -(this.cj1Init/animFrames);
+
+    this.cj0.rotateZ(this.cj0Init);
+    this.cj1.rotateZ(this.cj1Init);
+
+    c0.rotateY(Math.PI/2);
+    drill.add(c0);
+    return drill;    
+  }
+
+
   createShip()
   {
     var ship = new THREE.Object3D();
@@ -1028,6 +1101,15 @@ class MyShip extends THREE.Object3D {
     this.ship_light2.color.setHex(color.getHex());
   }
 
+  drillAnim()
+  {
+    this.cone.rotation.y += 0.1; 
+    this.cj0.rotation.z += this.inc0*this.animDir;
+    this.cj1.rotation.z += this.inc1*this.animDir;
+
+    if ((this.cj1.rotation.z <= this.cj1End) || (this.cj1.rotation.z >= this.cj1Init)) this.animDir *= -1;
+  }
+
   update () {
     // Con independencia de cómo se escriban las 3 siguientes líneas, el orden en el que se aplican las transformaciones es:
     // Primero, el escalado
@@ -1054,6 +1136,9 @@ class MyShip extends THREE.Object3D {
 
     //Volver luces a la normalidad
     if (this.ship_light0.color.getHex() != 0xF8E79F) this.colorAnim();
+
+    //Drill Animation
+    this.drillAnim();
   }
 }
 
