@@ -19,8 +19,16 @@
         }
     </style>
     <link rel="icon" type="image/png" href="saturn.png">
+    <link rel="stylesheet" href="./style.css">
 </head>
 <body>
+<!--HUD-->
+<div style="position: absolute; left:40px; bottom:40px;" id="">
+    <progress id="health" value="100" max="100" background-color=#39EC1E></progress>
+</div>
+
+<div style="position: absolute; left:40px; bottom:30px; color:aqua; font-family:'Courier New'" id="Mineral">
+</div>
 
 <!-- Div which will hold the Output -->
 <div id="WebGL-output">
