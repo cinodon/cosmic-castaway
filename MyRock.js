@@ -33,14 +33,14 @@ class MyRock extends THREE.Object3D {
         roughness: 0.1, // Rugosidad del cristal (0 = completamente liso, 1 = muy rugoso)
         clearcoat: 1, // Capa transparente adicional para dar brillo al cristal
         clearcoatRoughness: 0.1, // Rugosidad de la capa transparente
-        transmission: 0.9, // Transmitancia del material (0 = totalmente opaco, 1 = totalmente transparente)
+        transmission: 0.5, // Transmitancia del material (0 = totalmente opaco, 1 = totalmente transparente)
         ior: 1.5,
         map: texture
       }
     }
     else
     {
-      var textN = new THREE.TextureLoader().load('../imgs/ground-nmap.jpg');
+      //var textN = new THREE.TextureLoader().load('../imgs/ground-nmap.jpg');
       var textB = new THREE.TextureLoader().load('../imgs/stone-bmap.jpg');
       var text = new THREE.TextureLoader().load('../imgs/stone-texture.jpg');
       textSettings = {
@@ -51,7 +51,7 @@ class MyRock extends THREE.Object3D {
         transmission: 0, // Transmitancia del material (0 = totalmente opaco, 1 = totalmente transparente)
         map: text,
         bumpMap: textB,
-        normalMap: textN
+        bumpScale: 3
       }    
     } 
 

@@ -7,7 +7,7 @@ class MyShip extends THREE.Object3D {
     super();
     
     // Creación del GUI
-    this.createGUI(gui,titleGui);
+    //this.createGUI(gui,titleGui);
     
     //Estadísticas
     this.VIDA_MAX = 100;
@@ -15,7 +15,7 @@ class MyShip extends THREE.Object3D {
     this.mineral = 0;   //Equivalente a puntos
     this.invulnerable = false;
 
-    this.partPos = []; //Objeto para almacenar Obj3D importantes para castear rayos
+    this.partPos = [];
 
     //Propiedades de movimiento
     this.initMovementProperties(geomTubo);
@@ -124,6 +124,7 @@ class MyShip extends THREE.Object3D {
 
     //Propiedades iniciales de las armas
     this.WEAPONS = 3;
+    this.currentWeapon = 0;
     this.megaR.visible = false;
     this.tripleL.visible = false;
   }
@@ -283,9 +284,9 @@ class MyShip extends THREE.Object3D {
     var texture = textureLoader.load('../imgs/rusty-metal.jpg');
     var textB = textureLoader.load('../imgs/metal-bmap.jpg');
     var textN = textureLoader.load('../imgs/metal-nmap.jpg');
-    var rusty_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5, normalMap:textN, bumpMap:textB });
+    var rusty_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5, bumpMap:textB, bumpScale:3 });
     texture = textureLoader.load('../imgs/red-metal.jpeg');
-    var red_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5, normalMap:textN, bumpMap:textB });
+    var red_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5, normalMap:textN, normalScale:(3,3) });
     
 
     //Parte trasera
@@ -397,9 +398,9 @@ class MyShip extends THREE.Object3D {
     var textB = textureLoader.load('../imgs/metal-bmap.jpg');
     var textN = textureLoader.load('../imgs/metal-nmap.jpg');
     var texture = textureLoader.load('../imgs/red-metal.jpeg');
-    var red_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5, normalMap:textN, bumpMap:textB });
+    var red_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5, bumpMap:textB, bumpScale:3 });
     var texture = textureLoader.load('../imgs/weapon-tex.jpg');
-    var metal_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
+    var metal_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5, normalMap:textN, normalScale:(3,3) });
 
     //Material
     var mat = new THREE.MeshStandardMaterial();
@@ -1000,6 +1001,7 @@ class MyShip extends THREE.Object3D {
   changeWeapon(value)
   {
     console.log("NUEVO ARMA");
+    this.currentWeapon = value;
     switch(value)
     {
       case 0:

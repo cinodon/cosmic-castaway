@@ -261,15 +261,20 @@ class MyScene extends THREE.Scene {
 
   // El material se hará con una textura de cráteres
   var text = new THREE.TextureLoader().load('../imgs/crater.jpeg');
-  var nmap = new THREE.TextureLoader().load('../imgs/ground-nmap.jpg');
+  text.wrapS = THREE.MirroredRepeatWrapping;
+  text.wrapT = THREE.MirroredRepeatWrapping;
+  text.repeat.set(10,5);
+  //var nmap = new THREE.TextureLoader().load('../imgs/ground-nmap.jpg');
   var bmap = new THREE.TextureLoader().load('../imgs/stone-bmap.jpg');
   var materialGround = new THREE.MeshStandardMaterial({
     color: 0x808080, // Color gris
     roughness: 1, // Controla la aspereza de la superficie (valores entre 0 y 1)
     metalness: 0.1, // Controla la reflectividad metálica de la superficie (valores entre 0 y 1)
     map: text,
-    normalMap: nmap,
-    bumpMap: bmap
+    //normalMap: nmap,
+    //normalScale: (3,3),
+    bumpMap: bmap,
+    bumpScale: 3,
 
 });
 

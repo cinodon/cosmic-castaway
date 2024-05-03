@@ -33,7 +33,9 @@ class MyShot extends THREE.Object3D {
 
     //Material y mesh
     var over = 1;
-    var mat = new THREE.MeshBasicMaterial(0xA2FFF8);
+    var mat = new THREE.MeshStandardMaterial();
+    mat.color.setHex(0x00F8FC);
+    mat.emissive.set(0xB7FAFC);
     var geom = new THREE.SphereGeometry(0.25);
     this.shot = new THREE.Mesh(geom, mat);
     this.shot.scale.set(1, 1, 2);
