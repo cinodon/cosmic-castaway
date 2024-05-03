@@ -2,59 +2,97 @@ import * as THREE from '../libs/three.module.js'
 import { CSG } from '../libs/CSG-v2.js' 
 import * as TWEEN from '../libs/tween.esm.js' 
 
-
 class MyShip extends THREE.Object3D {
-  constructor(gui,titleGui, tube) {
+  constructor(gui,titleGui, geomTubo) {
     super();
     
-    // Se crea la parte de la interfaz que corresponde a la caja
-    // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
+    // Creación del GUI
     this.createGUI(gui,titleGui);
     
-    //Tubo
-      //Puntos
-      var l = 100;
-      var points = [
-        new THREE.Vector3(0, 0, 0),
-        new THREE.Vector3(0, 0, l),
-        new THREE.Vector3(-l/2, -l/2, 3*l/4),
-        new THREE.Vector3(l/2, -l/2, l/4),
-        new THREE.Vector3(0, l/2, 0),
-        new THREE.Vector3(-l/2, l/2, l/4),
-        new THREE.Vector3(l/2, l/2, 3*l/4),
-        new THREE.Vector3(l/2, l/2, 3*l/4),
-        new THREE.Vector3(0, -l/2, l),
-        new THREE.Vector3(l, -l/2, l),
-        new THREE.Vector3(l, -l/2, l/2),
-        new THREE.Vector3(0, l/2, l/2),
-        new THREE.Vector3(-l/2, l, 0),
+    //Estadísticas
+    this.VIDA_MAX = 100;
+    this.vida = this.VIDA_MAX;
+    this.mineral = 0;   //Equivalente a puntos
+    this.invulnerable = false;
 
-    ];
+    this.partPos = []; //Objeto para almacenar Obj3D importantes para castear rayos
 
-    this.spline = new THREE.CatmullRomCurve3( [ 
-      new THREE.Vector3(0, 0, 0),
-      new THREE.Vector3(0, 0, l),
-      new THREE.Vector3(l, 0, l),
-      new THREE.Vector3(l, 0, 0),
-      ], true );
+    //Propiedades de movimiento
+    this.initMovementProperties(geomTubo);
 
-    var geometriaLinea = new THREE.BufferGeometry();
-    geometriaLinea.setFromPoints( this.spline.getPoints(100) );
-    var material = new THREE.LineBasicMaterial( { color: 0x0F0F0F, linewidth: 5} ); 
-    this.recorrido = new THREE.Line(geometriaLinea, material);
-
-    
-    /*this.segmentos = 200;
-    this.binormales = this.spline.computeFrenetFrames(this.segmentos, true).binormals;
-    var origen = {t : 0};
-    var fin = {t : 1};
-    var tTotal = 10000; //10 Segundos*/
-    
     //Armas
+    //----------------------------------------------------------
+    this.initWeapons();
+    //----------------------------------------------------------
+
+
+    // Ya podemos construir el Mesh -- Nodo del personaje + traslación Y - posicionamiento
+    var over = 1;
+    this.ship = this.createShip();
+    this.ship.add(this.megaR, this.laserC, this.tripleL); //Añadimos armas
+    this.ship.position.y = this.radio + over;
+    this.partPos.push(this.ship);
+    
+    //HIT PROPERTIES
+    this.initHitProperties();
+
+    //Objeto animado --> Taladro
+    this.drill = this.createDrill();
+    this.drill.rotateZ(0.65);
+    this.drill.position.set(-0.2, 0.4, 1.5);
+    this.ship.add(this.drill);
+
+    //Luces
+    this.createLights();
+    this.light_current_color = this.ship_light0.color;
+    this.light_val = 0;
+
+    //Nodo - Rotación - Movimiento lateral
+    this.nodoRot = new THREE.Object3D();
+    this.nodoRot.add(this.ship);
+
+    //Nodo Orientación Tubo
+    this.nodoPosOrientTubo = new THREE.Object3D();
+    this.nodoPosOrientTubo.add(this.nodoRot);
+
+    //Añadir
+    this.add(this.nodoPosOrientTubo); 
+  }
+  
+  //Inicializar Propiedades
+//----------------------------------------------------------------------
+  initMovementProperties(geomTubo)
+  {
+    //Para controlar espacio, tiempo y velocidad
+    this.t = 0; //Posición longitudinal - 0 origen
+    var timeTotal = 60; //Tiempo total del circuito en segundos
+    this.spd = 1/timeTotal; //Velocidad
+    this.MIN_SPD =  this.spd/2;
+    //---------------------------------------------------------
+
+    this.inc_spd = this.spd * 0.1; //Incremento de velocidad
+    this.rotationSpeed = 0.03; //Velocidad de rotación
+    this.angle = 0; // Rotación de la nave en la superficie del tubo
+    this.on = 1;  //Hacer que la nave se detenga completamente
+    //---------------------------------------------------------
+
+    //Reloj
+    this.clock = new THREE.Clock();
+    this.clock.start();
+
+    //Tubo - Obtener información del tubo
+    this.tubo = geomTubo;
+    this.path = geomTubo.parameters.path;
+    this.radio = geomTubo.parameters.radius;
+    this.segmentos = geomTubo.parameters.tubularSegments;
+  }
+
+  initWeapons()
+  {
     var megaRP1 = this.createMegaRocket();
     megaRP1.rotation.y = 3*Math.PI/2;
     megaRP1.position.set(0.9, 1.05, -1.75);
-    
+
     var megaRP2 = this.createMegaRocket();
     megaRP2.rotation.y = 3*Math.PI/2;
     megaRP2.position.set(-0.9, 1.05, -1.75);
@@ -65,7 +103,7 @@ class MyShip extends THREE.Object3D {
     var laserCP1 = this.createLaserCanon();
     laserCP1.rotation.y = 3*Math.PI/2;
     laserCP1.position.set(0.9, 1.05, -1.75);
-    
+
     var laserCP2 = this.createLaserCanon();
     laserCP2.rotation.y = 3*Math.PI/2;
     laserCP2.position.set(-0.9, 1.05, -1.75);
@@ -76,57 +114,456 @@ class MyShip extends THREE.Object3D {
     var tripleLP1 = this.createTripleLaser();
     tripleLP1.rotation.y = 3*Math.PI/2;
     tripleLP1.position.set(0.9, 1.05, -1.75);
-    
+
     var tripleLP2 = this.createTripleLaser();
     tripleLP2.rotation.y = 3*Math.PI/2;
     tripleLP2.position.set(-0.9, 1.05, -1.75);
 
     this.tripleL = new THREE.Object3D();
     this.tripleL.add(tripleLP1, tripleLP2);
-    //-------------------------------------------------------------
+
+    //Propiedades iniciales de las armas
+    this.WEAPONS = 3;
+    this.megaR.visible = false;
+    this.tripleL.visible = false;
+  }
+
+  initHitProperties()
+  {
+    this.basePos = this.ship.position.y;
+    this.hitPos = this.ship.position.y + 2;
+    this.hitSpd = 0.5;
+    this.hitRpt = 0;
+    this.HITREPS_TOTAL = 6;
+    this.color_val = 0;
+    this.color_inc = 1/6;
+  }
+
+  createLights()
+  {
+    //Luz de la nave
+    var sphGS = new THREE.SphereGeometry(0.2);
+    var sphMS = new THREE.MeshBasicMaterial({
+      roughness: 0.2, 
+      metalness: 0.7,
+      transmission: 0.8 
+    });
+
+    var sphShip0 = new THREE.Mesh(sphGS, sphMS);
+    var sphShip1 = new THREE.Mesh(sphGS, sphMS);
+    var sphShip2 = new THREE.Mesh(sphGS, sphMS);
+
+    this.ship_light0 = new THREE.PointLight(0xF8E79F);
+    this.ship_light0.power = 200;
+    this.ship_light0.position.set(0, 0.75, -2.25)
+    this.ship_light0.add(sphShip0);
+
+    this.ship_light1 = new THREE.PointLight(0xF8E79F);
+    this.ship_light1.power = 100;
+    this.ship_light1.position.set(1, 0.65, -2.25)
+    this.ship_light1.add(sphShip1);
+
+    this.ship_light2 = new THREE.PointLight(0xF8E79F);
+    this.ship_light2.power = 100;
+    this.ship_light2.position.set(-1, 0.65, -2.25)
+    this.ship_light2.add(sphShip2);
+    
+
+    this.ship.add(this.ship_light0);
+    this.ship.add(this.ship_light1);
+    this.ship.add(this.ship_light2);
+  }
+//----------------------------------------------------------------------
+  //Creación de geometría
+//----------------------------------------------------------------------
+  createDrill()
+  {
+    //Drill mat
+    var textureLoader = new THREE.TextureLoader();
+    var texture = textureLoader.load('../imgs/rusty-metal.jpg');
+    var drillPartMat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
+    texture = textureLoader.load('../imgs/drill-text.jpg');
+    var drillMat = new THREE.MeshStandardMaterial( {map: texture, flatShading: false, needsUpdate: true, metalness: 1 });
+
+    var drill = new THREE.Object3D();
+    var l = 0.25;
+    var rl = 0.025;
+    var s = 0.15;
+    var jw = rl*2 + 0.005;
+    var jr = 0.05;
+    var cr = 0.1;
+    var ch = 0.5; 
+    var cilLG = new THREE.CylinderGeometry(rl, rl, l);
+    var cilSG = new THREE.CylinderGeometry(rl, rl, s);
+    var cilJ = new THREE.CylinderGeometry(jr, jr, jw);
+    var conoG = new THREE.ConeGeometry(cr, ch);
+    cilLG.translate(0, l/2, 0);
+    cilSG.translate(0, s/2, 0);
+    cilJ.rotateX(Math.PI/2);
+    conoG.translate(0, ch/2, 0)
+
+
+    var c0 = new THREE.Mesh(cilSG, drillPartMat);
+    var c1 = new THREE.Mesh(cilLG, drillPartMat);
+    var c2 = new THREE.Mesh(cilLG, drillPartMat);
+    this.cone = new THREE.Mesh(conoG, drillMat);
+    this.cj0 = new THREE.Mesh(cilJ, drillPartMat);
+    this.cj1 = new THREE.Mesh(cilJ, drillPartMat);
+
+    
+    c0.add(this.cj0);
+    this.cj0.add(c1)
+    this.cj0.position.y = jr + s;
+    c1.position.y = jr;
+    //cj0.rotateZ(Math.PI/2)
+    c1.add(this.cj1);
+    this.cj1.position.y = l + jr;
+    this.cj1.add(c2);
+    c2.position.y = jr;
+    c2.add(this.cone);
+    this.cone.position.y = l;
+    
+    //Animation
+    this.animDir = 1;
+    var animFrames = 100;
+    this.cj0Init = -1.24;
+    this.cj0End = Math.PI/2;
+    this.inc0 = (this.cj0End-this.cj0Init)/animFrames;
+
+    this.cj1Init = 2.65;
+    this.cj1End = 0;
+    this.inc1 = -(this.cj1Init/animFrames);
+
+    this.cj0.rotateZ(this.cj0Init);
+    this.cj1.rotateZ(this.cj1Init);
+
+    c0.rotateY(Math.PI/2);
+    drill.add(c0);
+    return drill;    
+  }
+
+
+  createShip()
+  {
+    var ship = new THREE.Object3D();
+    var over = 1; //Distancia a la que vuela de la superficie del tubo
+
+    //Trozos
+    //Parte de atrás
+    var back = this.createBack();
+    back.rotateY(Math.PI);
+    back.position.z = -2;
+    //back.position.y = this.radio + over;
+    
+
+
+    //Asiento
+    var seat = this.createSeat();
+    seat.rotateY(Math.PI);
+    //seat.position.y = this.radio + over;
+
+    //Parte frontal
+    var front = this.createFront();
+    front.rotateY(Math.PI);
+    //front.position.y = this.radio + over;
+
+
+    //Transformaciones
+    //back.position.z = 2;
+    ship.add(back, front, seat);
+    return ship;
+  }
+
+  createBack()
+  {
+    var back = new THREE.Object3D();
+    var back_w = 5;
+    //Materiales
+    var textureLoader = new THREE.TextureLoader();
+    var texture = textureLoader.load('../imgs/rusty-metal.jpg');
+    var rusty_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
+    texture = textureLoader.load('../imgs/red-metal.jpeg');
+    var red_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
+    
+
+    //Parte trasera
+    //--------------------------------------------------------------------------------
+    var shape = new THREE.Shape();
+    var x = 0; 
+    var y = 0;
+    shape.lineTo(x + 0.1, y + 0.3);
+    shape.moveTo(x + 0.1, y + 0.3);
+    shape.quadraticCurveTo(x + 2.4, y + 2, x + 4.9, y + 0.3);
+    shape.moveTo(x + 4.9, y + 0.3);
+    shape.lineTo(x + 5, y);
+
+    //Propiedades
+    var extrudeSettings = {
+      depth: 1, // Profundidad de la extrusión
+      bevelEnabled: true // Desactivar el biselado para mantener la forma original
+    };
+
+    var geomBack = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+
+    // Ya podemos construir el Mesh
+    var partBack = new THREE.Mesh (geomBack, red_mat);
+    //Ajuste de ejes
+    partBack.position.x = -2.5;
+    partBack.position.z = -0.75;
+    //--------------------------------------------------------------------------------
+    //Propulsores
+    var shape = new THREE.Shape();
+    var x = 0; 
+    var y = 0;
+    var puntaW = 0.072;
+    var anchoMax = 0.36;
+    var puntaH = 0.4;
+    var propulsorL = 4;
+    var propulsorBorde = 0.288;
+    var propulsorLMax = 4.2;
+    var turbinaW = 0.216;
+    var bordeH = 3.6;
+    shape.lineTo(x + puntaW, y);
+    shape.moveTo(x + puntaW, y);
+    shape.lineTo(x + anchoMax, y + puntaH);
+    shape.moveTo(x + anchoMax, y + puntaH);
+    shape.lineTo(anchoMax, propulsorL);
+    shape.moveTo(anchoMax, propulsorL);
+    shape.lineTo(propulsorBorde, propulsorL);
+    shape.moveTo(propulsorBorde, propulsorL);
+    shape.lineTo(propulsorBorde, bordeH);
+    shape.moveTo(propulsorBorde, bordeH);
+    shape.lineTo(turbinaW, bordeH);
+    shape.moveTo(turbinaW, bordeH);
+    shape.lineTo(turbinaW, propulsorLMax);
+    shape.moveTo(turbinaW, propulsorLMax);
+    shape.lineTo(x, propulsorLMax);
+    var geom = new THREE.LatheGeometry(shape.getPoints(), 20, 0, 2*Math.PI);
+    var prop1 = new THREE.Mesh( geom, rusty_mat ) ;
+    var prop2 = new THREE.Mesh( geom, rusty_mat ) ;
+    //Rotarlos
+    prop1.rotateX(Math.PI/2);
+    prop2.rotateX(Math.PI/2);
+    
+    //Posicionarlos
+    prop1.position.x = 2.5;
+    prop2.position.x = -2.5;
+    prop1.position.z = -2.8;
+    prop2.position.z = -2.8;
+    prop1.position.y = 0.15;
+    prop2.position.y = 0.15;
+    //--------------------------------------------------------------------------------
+    //Propulsores traseros
+    var propb_g = new THREE.TorusGeometry(0.5, 0.15, 4, 32, Math.PI*2);
+    var propb = new THREE.Mesh(propb_g, rusty_mat);
+    var propb2 = new THREE.Mesh(propb_g, rusty_mat);
+    var propb3 = new THREE.Mesh(propb_g, rusty_mat);
+    var propb4 = new THREE.Mesh(propb_g, rusty_mat);
+    //Posición
+    propb2.position.x = back_w/4;
+    propb3.position.x = -back_w/4;
+
+    propb.position.y = prop1.position.y + 0.4;
+    propb2.position.y = prop1.position.y + 0.4;
+    propb3.position.y = prop1.position.y + 0.4;
+    propb4.position.y = prop1.position.y + 0.4;
+
+    propb.position.z = 0.5;
+    propb2.position.z = 0.5;
+    propb3.position.z = 0.5;
+    propb4.position.z = 0.5;
+    //Escalado
+    propb2.scale.set(0.5, 0.5, 1);
+    propb3.scale.set(0.5, 0.5, 1);
+    propb4.scale.set(0.5, 0.5, 1);
+
+    this.partPos.push(prop1, prop2);
+    back.add(propb, propb2, propb3, propb4);
+    back.add(partBack);
+    back.add(prop1);
+    back.add(prop2);
+    back.scale.set(0.8, 0.8, 0.8);
+    back.position.y = 0.21;
+    
+    return back;
+  }
+
+  createFront()
+  {
+    //Materials
+    var textureLoader = new THREE.TextureLoader();
+    var texture = textureLoader.load('../imgs/red-metal.jpeg');
+    var red_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
+    var texture = textureLoader.load('../imgs/weapon-tex.jpg');
+    var metal_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
+
+    //Material
+    var mat = new THREE.MeshStandardMaterial();
+    var box_sub_g = new THREE.BoxGeometry(3, 3, 7);
+    var box = new THREE.Mesh(box_sub_g, mat);
+
+    var cil = new THREE.CylinderGeometry(0, 1, 1, 20, 1, false);
+    var glass_mat = new THREE.MeshPhysicalMaterial({
+      color: 0xffffCC, // Color del cristal
+      transparent: true, // Hacer el material transparente
+      opacity: 0.5, // Nivel de transparencia (0 = completamente transparente, 1 = completamente opaco)
+      roughness: 0.1, // Rugosidad del cristal (0 = completamente liso, 1 = muy rugoso)
+      metalness: 0.5, // Metalidad del cristal (0 = no metálico, 1 = completamente metálico)
+      clearcoat: 1, // Capa transparente adicional para dar brillo al cristal
+      clearcoatRoughness: 0.1, // Rugosidad de la capa transparente
+      transmission: 0.9, // Transmitancia del material (0 = totalmente opaco, 1 = totalmente transparente)
+      ior: 1.5, // Índice de refracción del cristal
+      side: THREE.DoubleSide
+    });
+
+
+    var geom = new THREE.CapsuleGeometry(0.25, 1, 10, 20);
+    
+    var glass = new THREE.Mesh(cil, glass_mat);
+    var fl = new THREE.Mesh(geom, metal_mat);
+    var ff_punta = new THREE.Mesh(geom, red_mat); 
+    var fr = new THREE.Mesh(geom, metal_mat);
+    var ff = new THREE.Mesh(geom, metal_mat);
+
+    //Rotacion
+    glass.rotateX(Math.PI/2);
+    fl.rotateX(Math.PI/2);  
+    fr.rotateX(Math.PI/2);
+    ff.rotateX(Math.PI/2);
+    ff_punta.rotateX(Math.PI/2);
+
+    //Escalado
+    glass.scale.set(0.5, 1, 0.5);
+    ff.scale.set(3, 1.5, 1);
+    ff_punta.scale.set(3, 5, 1);
+
+    //Traslación
+    glass.position.z = 0.3;
+    glass.position.y = 0.2;
+    fl.position.x = -0.5;
+    fr.position.x = 0.5;
+    ff.position.z = 0.25;
+    box.position.z = 1;
+
+
+
+    //CSG para la punta
+    var csg = new CSG();
+    csg.subtract([ff_punta, box])
+    
+    var punta = csg.toMesh();
+    punta.rotateX(Math.PI);
+    punta.position.z = -1.5;
+    
+    var front = new THREE.Object3D();
+    
+    //Redondeamos la zona del asiento restando una esfera
+    //Material
+    var mat = new THREE.MeshStandardMaterial();
+    var spg = new THREE.SphereGeometry(0.75, 32, 16, 0, Math.PI);
+    var sp = new THREE.Mesh(spg, mat);
+    var cil = new THREE.CylinderGeometry(0.75, 0.75, 2, 32, 16, false);
+    var sp2 = new THREE.Mesh(cil, glass_mat);
+    
+    //Ajustamos la posición
+    sp.position.z = -0.75;
+    sp2.position.z = -0.75;
+    sp2.position.y = 0.2;
+
+    //Alejar de Eje Y
+    sp2.position.x += 5; 
+    sp2.position.z += 5;
+    glass.position.z += 5;
+    glass.position.x += 5;
+
+    var csg3 = new CSG();
+    csg3.subtract([glass, sp2]);
+    var ft_gl = csg3.toMesh();
+    ft_gl.position.z -= 5;
+    ft_gl.position.x -= 5;
+
+    var csg2 = new CSG();
+    csg2.union([fl, fr]);
+    csg2.union([ff]);
+    csg2.subtract([sp]);
+    
+    var ft = csg2.toMesh();
+
+    front.add(ft, punta, ft_gl);
+    front.rotateY(Math.PI);
+    front.position.y = 0.25; 
+
+    return front;
+  }
+
+  createSeat()
+  {
+    //Objeto final
+    var seat = new THREE.Object3D();
 
     //Material
     var textureLoader = new THREE.TextureLoader();
-    var texture = textureLoader.load('../imgs/copper.jpeg');
-    this.mat = new THREE.MeshStandardMaterial({ map: texture });
-    this.mat.flatShading = true;
-    this.mat.needsUpdate = true;
+    var texture = textureLoader.load('../imgs/black_leather.jpeg');
+    var seat_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
+    var texture = textureLoader.load('../imgs/rusty-metal.jpg');
+    var plate_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
 
-    // Ya podemos construir el Mesh
-    this.mesh = this.createShip();
-    this.mesh.add(this.megaR, this.laserC, this.tripleL);
-    // Y añadirlo como hijo del Object3D (el this)
-    this.add (this.mesh);
 
-    //Animacion
-    var origen = {p:0};
-    var destino = {p : 1};
-  
-    /*var posicion = this.spline.getPoint(origen.p);
-    this.mesh.position.copy(posicion);
-    var tangente = this.spline.getTangentAt(origen.p); //Orientamos el obj 
-    posicion.add(tangente); 
-    this.mesh.lookAt(posicion); 
-    this.binormales = this.spline.computeFrenetFrames(100 , true ).binormals ;
+    //Partes
+    //Placa de sujección
+    var box_h = 0.1;
+    var bgeom = new THREE.BoxGeometry(1,1,1);
+    var box = new THREE.Mesh(bgeom, plate_mat);
+
+    //Transformaciones a la placa
+    box.scale.set(1, 0.1, 1.9);
+    box.position.y = 0.1;
+    box.position.z = 1;
+
+    //Asiento
+    var shape = new THREE.Shape();
+    var swm = 0.05; //Ancho máximo con bultos
+    var sw = swm - 0.02; //Ancho máximo sin bultos
+    var sh = 0.72;
+    var sl = swm + sh;
+    var x = 0;
+    var y = 0;
+    shape.lineTo(sl, 0);
+    shape.moveTo(sl, 0);
+    shape.quadraticCurveTo(sl-sh/6, swm, sl-sh/3, sw);
+    shape.moveTo(sl-sh/3, sw);
+    shape.quadraticCurveTo(sl-sh/3-sh/6, swm, sl-2*sh/3, sw);
+    shape.moveTo(sl-2*sh/3, sw);
+    shape.quadraticCurveTo(sl-2*sh/3-sh/6, swm, sl-3*sh/3, sw);
+    shape.moveTo(sl-3*sh/3, sw);
+    shape.quadraticCurveTo(x + 2*swm, y + sh/3 + sh/6, x + sw, y + sh/3);
+    shape.moveTo(x + sw, y + sh/3);
+    shape.quadraticCurveTo(x + 2*swm, y + sh/3 + sh/6, x + sw, y + 2*sh/3);
+    shape.moveTo(x + swm, y + 2*sh/3);
+    shape.quadraticCurveTo(x + 2*swm, y + 2*sh/3 + sh/6, 0, y + 3*sh/3);
     
-    var movimiento = new TWEEN.Tween(origen).to(destino, 10000) //10s 
-    .onUpdate(()=>{ 
-      posicion = this.spline.getPoint(origen.p); //Modificar la pos a la nueva de origen 
-      this.mesh.position.copy(posicion); 
-      var tangente = this.spline.getTangentAt(origen.p); //Orientamos el obj 
-      posicion.add(tangente); 
-      //this.mesh.up = this.binormales[Math.floor(origen.p * 100)]
-      this.mesh.lookAt(posicion);
-      //this.mesh.rotateX(Math.PI/2); 
-      //this.auricular.rotation.x += 0.01; 
-    })
-    .start() 
-    .repeat(Infinity)
-    .onComplete(() => {origen.p = 0;})*/
-    //Añadir on complete --> que cuando complete una vuelta aumente la velocidad y por tanto se reduzca el tiempo
+
+    //Propiedades
+    var seat_width = 0.7;
+    var extrudeSettings = {
+      depth: seat_width, // Profundidad de la extrusión
+      bevelEnabled: true // Desactivar el biselado para mantener la forma original
+    };
+
+    var seat_g = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    var seat_part = new THREE.Mesh (seat_g, seat_mat);
+    seat_part.rotateY(Math.PI/2);
+    seat_part.position.x = -seat_width/2;
+    seat_part.position.z = 2 - 0.8 - 0.025;
+    seat_part.position.y = box.position.y + box_h;
     
+
+    //Añadir partes
+    seat.add(seat_part, box);
+    return seat;
   }
-  
+
+  //Creación de armas
   createTripleLaser()
   {
     var canon = new THREE.Object3D();
@@ -243,7 +680,8 @@ class MyShip extends THREE.Object3D {
       metalness: 0.5,
       roughness: 0.2,
       color: 0xE09437,
-      emissive: 0xFEAE4E,   
+      emissive: 0xFEAE4E,
+      emissiveIntensity: 1,   
       needsUpdate: true   
   });
 
@@ -347,8 +785,9 @@ class MyShip extends THREE.Object3D {
       flatShading: false,              // No usar sombreado plano para obtener transiciones de color suaves
       metalness: 0.5,
       roughness: 0.2,
-      color: 0xE09437,
-      emissive: 0xFEAE4E,   
+      color: 0x4CA6D1,
+      emissive: 0xABFFF5,
+      emissiveIntensity: 1,   
       needsUpdate: true   
   });
 
@@ -457,325 +896,14 @@ class MyShip extends THREE.Object3D {
     canon.add(mangoM, culataM, canonM);
     return canon;
   }
-
-
-  createShip()
-  {
-    var ship = new THREE.Object3D();
-
-    //Trozos
-    //Parte de atrás
-    var back = this.createBack();
-    back.rotateY(Math.PI);
-    back.position.z = -2;
-    //back.position.y = 3;
-    
-
-
-    //Asiento
-    var seat = this.createSeat();
-    seat.rotateY(Math.PI);
-    //seat.position.y = 3;
-
-    //Parte frontal
-    var front = this.createFront();
-    front.rotateY(Math.PI);
-    //front.position.y = 3;
-
-
-    //Transformaciones
-    //back.position.z = 2;
-    ship.add(back, front, seat);
-    return ship;
-  }
-
-  createBack()
-  {
-    var back = new THREE.Object3D();
-    var back_w = 5;
-    //Materiales
-    var textureLoader = new THREE.TextureLoader();
-    var texture = textureLoader.load('../imgs/rusty-metal.jpg');
-    var rusty_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
-    texture = textureLoader.load('../imgs/red-metal.jpeg');
-    var red_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
-
-    //Parte trasera
-    //--------------------------------------------------------------------------------
-    var shape = new THREE.Shape();
-    var x = 0; 
-    var y = 0;
-    shape.lineTo(x + 0.1, y + 0.3);
-    shape.moveTo(x + 0.1, y + 0.3);
-    shape.quadraticCurveTo(x + 2.4, y + 2, x + 4.9, y + 0.3);
-    shape.moveTo(x + 4.9, y + 0.3);
-    shape.lineTo(x + 5, y);
-
-    //Propiedades
-    var extrudeSettings = {
-      depth: 1, // Profundidad de la extrusión
-      bevelEnabled: true // Desactivar el biselado para mantener la forma original
-    };
-
-    var geomBack = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-
-    // Ya podemos construir el Mesh
-    var partBack = new THREE.Mesh (geomBack, red_mat);
-    //Ajuste de ejes
-    partBack.position.x = -2.5;
-    partBack.position.z = -0.75;
-    //--------------------------------------------------------------------------------
-    //Propulsores
-    var shape = new THREE.Shape();
-    var x = 0; 
-    var y = 0;
-    var puntaW = 0.072;
-    var anchoMax = 0.36;
-    var puntaH = 0.4;
-    var propulsorL = 4;
-    var propulsorBorde = 0.288;
-    var propulsorLMax = 4.2;
-    var turbinaW = 0.216;
-    var bordeH = 3.6;
-    shape.lineTo(x + puntaW, y);
-    shape.moveTo(x + puntaW, y);
-    shape.lineTo(x + anchoMax, y + puntaH);
-    shape.moveTo(x + anchoMax, y + puntaH);
-    shape.lineTo(anchoMax, propulsorL);
-    shape.moveTo(anchoMax, propulsorL);
-    shape.lineTo(propulsorBorde, propulsorL);
-    shape.moveTo(propulsorBorde, propulsorL);
-    shape.lineTo(propulsorBorde, bordeH);
-    shape.moveTo(propulsorBorde, bordeH);
-    shape.lineTo(turbinaW, bordeH);
-    shape.moveTo(turbinaW, bordeH);
-    shape.lineTo(turbinaW, propulsorLMax);
-    shape.moveTo(turbinaW, propulsorLMax);
-    shape.lineTo(x, propulsorLMax);
-    var geom = new THREE.LatheGeometry(shape.getPoints(), 20, 0, 2*Math.PI);
-    var prop1 = new THREE.Mesh( geom, rusty_mat ) ;
-    var prop2 = new THREE.Mesh( geom, rusty_mat ) ;
-    //Rotarlos
-    prop1.rotateX(Math.PI/2);
-    prop2.rotateX(Math.PI/2);
-    
-    //Posicionarlos
-    prop1.position.x = 2.5;
-    prop2.position.x = -2.5;
-    prop1.position.z = -2.8;
-    prop2.position.z = -2.8;
-    prop1.position.y = 0.15;
-    prop2.position.y = 0.15;
-    //--------------------------------------------------------------------------------
-    //Propulsores traseros
-    var propb_g = new THREE.TorusGeometry(0.5, 0.15, 4, 32, Math.PI*2);
-    var propb = new THREE.Mesh(propb_g, rusty_mat);
-    var propb2 = new THREE.Mesh(propb_g, rusty_mat);
-    var propb3 = new THREE.Mesh(propb_g, rusty_mat);
-    var propb4 = new THREE.Mesh(propb_g, rusty_mat);
-    //Posición
-    propb2.position.x = back_w/4;
-    propb3.position.x = -back_w/4;
-
-    propb.position.y = prop1.position.y + 0.4;
-    propb2.position.y = prop1.position.y + 0.4;
-    propb3.position.y = prop1.position.y + 0.4;
-    propb4.position.y = prop1.position.y + 0.4;
-
-    propb.position.z = 0.5;
-    propb2.position.z = 0.5;
-    propb3.position.z = 0.5;
-    propb4.position.z = 0.5;
-    //Escalado
-    propb2.scale.set(0.5, 0.5, 1);
-    propb3.scale.set(0.5, 0.5, 1);
-    propb4.scale.set(0.5, 0.5, 1);
-
-
-    back.add(propb, propb2, propb3, propb4);
-    back.add(partBack);
-    back.add(prop1);
-    back.add(prop2);
-    back.scale.set(0.8, 0.8, 0.8);
-    back.position.y = 0.21;
-    
-    return back;
-  }
-
-  createFront()
-  {
-    //Materials
-    var textureLoader = new THREE.TextureLoader();
-    var texture = textureLoader.load('../imgs/red-metal.jpeg');
-    var red_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
-    var texture = textureLoader.load('../imgs/weapon-tex.jpg');
-    var metal_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
-
-    var box_sub_g = new THREE.BoxGeometry(3, 3, 7);
-    var box = new THREE.Mesh(box_sub_g, this.mat);
-
-    var cil = new THREE.CylinderGeometry(0, 1, 1, 20, 1, false);
-    var glass_mat = new THREE.MeshPhysicalMaterial({
-      color: 0xffffCC, // Color del cristal
-      transparent: true, // Hacer el material transparente
-      opacity: 0.5, // Nivel de transparencia (0 = completamente transparente, 1 = completamente opaco)
-      roughness: 0.1, // Rugosidad del cristal (0 = completamente liso, 1 = muy rugoso)
-      metalness: 0.5, // Metalidad del cristal (0 = no metálico, 1 = completamente metálico)
-      clearcoat: 1, // Capa transparente adicional para dar brillo al cristal
-      clearcoatRoughness: 0.1, // Rugosidad de la capa transparente
-      transmission: 0.9, // Transmitancia del material (0 = totalmente opaco, 1 = totalmente transparente)
-      ior: 1.5, // Índice de refracción del cristal
-      side: THREE.DoubleSide
-    });
-
-    var geom = new THREE.CapsuleGeometry(0.25, 1, 10, 20);
-    
-    var glass = new THREE.Mesh(cil, glass_mat);
-    var fl = new THREE.Mesh(geom, metal_mat);
-    var ff_punta = new THREE.Mesh(geom, red_mat); 
-    var fr = new THREE.Mesh(geom, metal_mat);
-    var ff = new THREE.Mesh(geom, metal_mat);
-
-    //Rotacion
-    glass.rotateX(Math.PI/2);
-    fl.rotateX(Math.PI/2);  
-    fr.rotateX(Math.PI/2);
-    ff.rotateX(Math.PI/2);
-    ff_punta.rotateX(Math.PI/2);
-
-    //Escalado
-    glass.scale.set(0.5, 1, 0.5);
-    ff.scale.set(3, 1.5, 1);
-    ff_punta.scale.set(3, 5, 1);
-
-    //Traslación
-    glass.position.z = 0.3;
-    glass.position.y = 0.2;
-    fl.position.x = -0.5;
-    fr.position.x = 0.5;
-    ff.position.z = 0.25;
-    box.position.z = 1;
-
-
-
-    //CSG para la punta
-    var csg = new CSG();
-    csg.subtract([ff_punta, box])
-    
-    var punta = csg.toMesh();
-    punta.rotateX(Math.PI);
-    punta.position.z = -1.5;
-    
-    var front = new THREE.Object3D();
-    
-    //Redondeamos la zona del asiento restando una esfera
-    var spg = new THREE.SphereGeometry(0.75, 32, 16, 0, Math.PI);
-    var sp = new THREE.Mesh(spg, this.mat);
-    var cil = new THREE.CylinderGeometry(0.75, 0.75, 2, 32, 16, false);
-    var sp2 = new THREE.Mesh(cil, glass_mat);
-    
-    //Ajustamos la posición
-    sp.position.z = -0.75;
-    sp2.position.z = -0.75;
-    sp2.position.y = 0.2;
-
-    //Alejar de Eje Y
-    sp2.position.x += 5; 
-    sp2.position.z += 5;
-    glass.position.z += 5;
-    glass.position.x += 5;
-
-    var csg3 = new CSG();
-    csg3.subtract([glass, sp2]);
-    var ft_gl = csg3.toMesh();
-    ft_gl.position.z -= 5;
-    ft_gl.position.x -= 5;
-
-    var csg2 = new CSG();
-    csg2.union([fl, fr]);
-    csg2.union([ff]);
-    csg2.subtract([sp]);
-    
-    var ft = csg2.toMesh();
-
-    front.add(ft, punta, ft_gl);
-    front.rotateY(Math.PI);
-    front.position.y = 0.25; 
-
-    return front;
-  }
-
-  createSeat()
-  {
-    //Objeto final
-    var seat = new THREE.Object3D();
-
-    //Material
-    var textureLoader = new THREE.TextureLoader();
-    var texture = textureLoader.load('../imgs/black_leather.jpeg');
-    var seat_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
-    var texture = textureLoader.load('../imgs/rusty-metal.jpg');
-    var plate_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
-
-    //Partes
-    //Placa de sujección
-    var box_h = 0.1;
-    var bgeom = new THREE.BoxGeometry(1,1,1);
-    var box = new THREE.Mesh(bgeom, plate_mat);
-
-    //Transformaciones a la placa
-    box.scale.set(1, 0.1, 1.9);
-    box.position.y = 0.1;
-    box.position.z = 1;
-
-    //Asiento
-    var shape = new THREE.Shape();
-    var swm = 0.05; //Ancho máximo con bultos
-    var sw = swm - 0.02; //Ancho máximo sin bultos
-    var sh = 0.72;
-    var sl = swm + sh;
-    var x = 0;
-    var y = 0;
-    shape.lineTo(sl, 0);
-    shape.moveTo(sl, 0);
-    shape.quadraticCurveTo(sl-sh/6, swm, sl-sh/3, sw);
-    shape.moveTo(sl-sh/3, sw);
-    shape.quadraticCurveTo(sl-sh/3-sh/6, swm, sl-2*sh/3, sw);
-    shape.moveTo(sl-2*sh/3, sw);
-    shape.quadraticCurveTo(sl-2*sh/3-sh/6, swm, sl-3*sh/3, sw);
-    shape.moveTo(sl-3*sh/3, sw);
-    shape.quadraticCurveTo(x + 2*swm, y + sh/3 + sh/6, x + sw, y + sh/3);
-    shape.moveTo(x + sw, y + sh/3);
-    shape.quadraticCurveTo(x + 2*swm, y + sh/3 + sh/6, x + sw, y + 2*sh/3);
-    shape.moveTo(x + swm, y + 2*sh/3);
-    shape.quadraticCurveTo(x + 2*swm, y + 2*sh/3 + sh/6, 0, y + 3*sh/3);
-    
-
-    //Propiedades
-    var seat_width = 0.7;
-    var extrudeSettings = {
-      depth: seat_width, // Profundidad de la extrusión
-      bevelEnabled: true // Desactivar el biselado para mantener la forma original
-    };
-
-    var seat_g = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-    var seat_part = new THREE.Mesh (seat_g, seat_mat);
-    seat_part.rotateY(Math.PI/2);
-    seat_part.position.x = -seat_width/2;
-    seat_part.position.z = 2 - 0.8 - 0.025;
-    seat_part.position.y = box.position.y + box_h;
-    
-
-    //Añadir partes
-    seat.add(seat_part, box);
-    return seat;
-  }
+//----------------------------------------------------------------------
 
   createGUI (gui,titleGui) {
     // Controles para el tamaño, la orientación y la posición de la caja
     this.guiControls = {
-      sizeX : 1.0,
-      sizeY : 1.0,
+      //vida: this.VIDA_MAX,
+      //sizeX : 1.0,
+      /*sizeY : 1.0,
       sizeZ : 1.0,
       
       rotX : 0.0,
@@ -786,13 +914,14 @@ class MyShip extends THREE.Object3D {
       posY : 0.0,
       posZ : 0.0,
 
-      visible : true,
+      visible : true,*/
       
       // Un botón para dejarlo todo en su posición inicial
       // Cuando se pulse se ejecutará esta función.
       reset : () => {
-        this.guiControls.sizeX = 1.0;
-        this.guiControls.sizeY = 1.0;
+        //this.guiControls.vida = this.VIDA_MAX;
+        //this.guiControls.sizeX = 1.0;
+        /*this.guiControls.sizeY = 1.0;
         this.guiControls.sizeZ = 1.0;
         
         this.guiControls.rotX = 0.0;
@@ -803,17 +932,18 @@ class MyShip extends THREE.Object3D {
         this.guiControls.posY = 0.0;
         this.guiControls.posZ = 0.0;
 
-        this.guiControls.visible = true;
+        this.guiControls.visible = true;*/
+
       }
     } 
     
     // Se crea una sección para los controles de la caja
-    var folder = gui.addFolder (titleGui);
+    //var folder = gui.addFolder (titleGui);
     // Estas lineas son las que añaden los componentes de la interfaz
     // Las tres cifras indican un valor mínimo, un máximo y el incremento
     // El método   listen()   permite que si se cambia el valor de la variable en código, el deslizador de la interfaz se actualice
-    folder.add (this.guiControls, 'sizeX', 0.1, 5.0, 0.01).name ('Tamaño X : ').listen();
-    folder.add (this.guiControls, 'sizeY', 0.1, 5.0, 0.01).name ('Tamaño Y : ').listen();
+    //folder.add (this.guiControls, 'sizeX', 0.1, 5.0, 0.01).name ('Tamaño X : ').listen();
+    /*folder.add (this.guiControls, 'sizeY', 0.1, 5.0, 0.01).name ('Tamaño Y : ').listen();
     folder.add (this.guiControls, 'sizeZ', 0.1, 5.0, 0.01).name ('Tamaño Z : ').listen();
     
     folder.add (this.guiControls, 'rotX', 0.0, Math.PI/2, 0.01).name ('Rotación X : ').listen();
@@ -822,19 +952,162 @@ class MyShip extends THREE.Object3D {
     
     folder.add (this.guiControls, 'posX', -20.0, 20.0, 0.01).name ('Posición X : ').listen();
     folder.add (this.guiControls, 'posY', 0.0, 10.0, 0.01).name ('Posición Y : ').listen();
-    folder.add (this.guiControls, 'posZ', -20.0, 20.0, 0.01).name ('Posición Z : ').listen();
-
-    // Y otro para mostrar u ocultar los ejes
-    folder.add (this.guiControls, 'visible')
-    .name ('Mostrar modelo : ')
-    .onChange ( (value) => this.setShipVisible (value) );
-    
-    folder.add (this.guiControls, 'reset').name ('[ Reset ]');
+    folder.add (this.guiControls, 'posZ', -20.0, 20.0, 0.01).name ('Posición Z : ').listen();*/
   }
   
   setShipVisible(value)
   {
     this.mesh.visible = value;
+  }
+
+  actualizarPosicion()
+  {
+    //Colocar el personaje
+    var posTmp = this.path.getPointAt (this.t);
+    this.nodoPosOrientTubo.position.copy(posTmp);
+
+    //Orientación
+    var tangente = this.path.getTangentAt(this.t);
+    posTmp.add(tangente);
+    var segmentoActual = Math.floor(this.t * this.segmentos);
+    this.nodoPosOrientTubo.up = this.tubo.binormals[segmentoActual];
+    this.nodoPosOrientTubo.lookAt (posTmp);
+  }
+
+  actualizarRotacion(dir)
+  {
+    //Rotar
+    this.angle += dir* this.rotationSpeed;
+
+    //Ajuste
+    if (this.angle > 2*Math.PI) this.angle = 0;
+    if (this.angle < 0) this.angle = 2*Math.PI; 
+  }
+
+  //Método para debug
+  detenerNave()
+  {
+    this.on *= -1;
+    console.log(this.on);  
+  }
+
+  changeWeapon(value)
+  {
+    console.log("NUEVO ARMA");
+    switch(value)
+    {
+      case 0:
+        this.laserC.visible = true;
+        this.megaR.visible = false;
+        this.tripleL.visible = false;
+      break;
+
+      case 1:
+        this.laserC.visible = false;
+        this.megaR.visible = true;
+        this.tripleL.visible = false;        
+      break;
+
+      case 2:
+        this.laserC.visible = false;
+        this.megaR.visible = false;
+        this.tripleL.visible = true;        
+      break;
+    }
+  }
+  
+  getCrystal()
+  {
+    this.mineral++;
+    console.log("MINERAL: ", this.mineral);
+      //Cambiar de color las luces
+      this.ship_light0.color.setHex(0x05E0FD);
+      this.ship_light1.color.setHex(0x05E0FD);
+      this.ship_light2.color.setHex(0x05E0FD);
+      this.light_current_color = this.ship_light0.color;
+      this.light_val = 0;
+  }
+
+  hit(value)
+  {
+    //Si es vulnerable 
+    if (this.invulnerable == false)
+    {
+      if (this.spd > this.MIN_SPD) this.spd = this.spd - 2*this.inc_spd;
+      this.vida -= value;
+      console.log("DAÑO - VIDA:", this.vida);
+
+      //Llamar animación de daño
+      this.invulnerable = true;
+
+      //Cambiar de color las luces
+      this.ship_light0.color.setHex(0xFD0505);
+      this.ship_light1.color.setHex(0xFD0505);
+      this.ship_light2.color.setHex(0xFD0505);
+      this.light_current_color = this.ship_light0.color;
+      this.light_val = 0;
+    }
+  }
+
+  heal()
+  {
+    if (this.vida < this.VIDA_MAX) this.vida += 5;
+    this.spd = this.spd + this.inc_spd
+    console.log("ARMAZON REPARADO > ", this.vida);
+
+    //Cambiar de color las luces
+    this.ship_light0.color.setHex(0x05FD3F);
+    this.ship_light1.color.setHex(0x05FD3F);
+    this.ship_light2.color.setHex(0x05FD3F);
+    this.light_current_color = this.ship_light0.color;
+    this.light_val = 0;
+
+  }
+
+  hitAnim()
+  {
+    this.ship.position.y += this.hitSpd;
+    if ((this.ship.position.y > this.hitPos) || (this.ship.position.y <= this.basePos))
+    {
+      this.hitSpd *= -1;
+      this.hitRpt++;
+    }
+
+    //Final de animación
+    if (this.hitRpt == this.HITREPS_TOTAL)
+    {
+      this.invulnerable = false;
+      this.hitRpt = 0;
+      this.ship.position.y = this.basePos;
+      this.spd = this.spd + this.inc_spd; //Recupera un poco la velocidad anterior
+
+      //Cambiar de color las luces
+      /*this.ship_light0.color.setHex(0xF8E79F);
+      this.ship_light1.color.setHex(0xF8E79F);
+      this.ship_light2.color.setHex(0xF8E79F);*/
+      //this.light_val = 0;
+    }
+  }
+
+  colorAnim()
+  {
+    var color = new THREE.Color();
+    var color2 = new THREE.Color(0xF8E79F);
+    color.lerpColors(this.light_current_color, color2, this.light_val);
+    if (this.light_val < 1) this.light_val += 0.015; 
+
+    this.ship_light0.color.setHex(color.getHex());
+    this.ship_light1.color.setHex(color.getHex());
+    this.ship_light2.color.setHex(color.getHex());
+  }
+
+  drillAnim()
+  {
+    this.cone.rotation.y += 0.1; 
+    this.cj0.rotation.z += this.inc0*this.animDir;
+    this.cj1.rotation.z += this.inc1*this.animDir;
+
+    if ((this.cj1.rotation.z <= this.cj1End) || (this.cj1.rotation.z >= this.cj1Init)) this.animDir *= -1;
   }
 
   update () {
@@ -844,15 +1117,28 @@ class MyShip extends THREE.Object3D {
     // Después, la rotación en Y
     // Luego, la rotación en X
     // Y por último la traslación
-   
-    this.position.set (this.guiControls.posX,this.guiControls.posY,this.guiControls.posZ);
-    //this.rotation.set (this.guiControls.rotX,this.guiControls.rotY,this.guiControls.rotZ);
-    this.scale.set (this.guiControls.sizeX,this.guiControls.sizeY,this.guiControls.sizeZ);
-    //this.mesh.rotation.x += 0.01;
-    //TWEEN.update();
+    var time = this.clock.getDelta(); 
+    if (this.on == 1) this.t += this.spd * time;
+    if (this.t >= 1) 
+    {
+      //Reiniciar posicion
+      this.t = 0;
 
-    
+      //Aumentar velocidad un %10
+      this.spd += this.inc_spd;
+    }
+    this.actualizarPosicion();
+    //this.angle += this.rotationSpeed;
+    this.nodoRot.rotation.z = this.angle;
 
+    //Animación de recibir daño
+    if (this.invulnerable == true) this.hitAnim();
+
+    //Volver luces a la normalidad
+    if (this.ship_light0.color.getHex() != 0xF8E79F) this.colorAnim();
+
+    //Drill Animation
+    this.drillAnim();
   }
 }
 
