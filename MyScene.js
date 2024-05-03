@@ -70,6 +70,8 @@ class MyScene extends THREE.Scene {
     this.add(this.rock);
 
 
+    this.drill = new MyDrill(this.gui, "Taladro");
+    this.add(this.drill);
 
     //Armas
     /*this.weapon0 = new MyLaserCannon(this.gui, "Control del Cañon Láser");
@@ -282,7 +284,7 @@ class MyScene extends THREE.Scene {
     this.cameraControl.update();
     
     // Se actualiza el resto del modelo
-    //this.drill.update();
+    this.drill.update();
 
 
 
