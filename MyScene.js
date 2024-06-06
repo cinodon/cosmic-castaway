@@ -170,14 +170,28 @@ class MyScene extends THREE.Scene {
     this.listener = new THREE.AudioListener();
     this.playerCam.add(this.listener);
     this.audioLoader = new THREE.AudioLoader();
-    this.shotSnd = new THREE.Audio(this.listener);
+    this.shotSnd0 = new THREE.Audio(this.listener);
+    this.shotSnd1 = new THREE.Audio(this.listener);
+    this.rockSnd = new THREE.Audio(this.listener);
 
      
-    this.audioLoader.load("./sounds/shot.mp3", (buffer) => {
-      this.shotSnd.setBuffer(buffer);
-      this.shotSnd.setLoop(false); 
-      this.shotSnd.setVolume(0.5);
-  });
+    this.audioLoader.load("./sounds/shot0.mp3", (buffer) => {
+        this.shotSnd0.setBuffer(buffer);
+        this.shotSnd0.setLoop(false); 
+        this.shotSnd0.setVolume(1);
+    });
+
+    this.audioLoader.load("./sounds/shot1.mp3", (buffer) => {
+      this.shotSnd1.setBuffer(buffer);
+      this.shotSnd1.setLoop(false); 
+      this.shotSnd1.setVolume(1);
+    });
+
+    this.audioLoader.load("./sounds/rock_break.mp3", (buffer) => {
+      this.rockSnd.setBuffer(buffer);
+      this.rockSnd.setLoop(false); 
+      this.rockSnd.setVolume(1);
+    });
 
     
     //Background
@@ -513,10 +527,20 @@ class MyScene extends THREE.Scene {
       var shot = new MyShot(this.gui, "Disparo "+ this.ship.t, this.tube.geometry, this.ship.angle, this.ship.t, this.ship.spd, this.ship);
       
       // Reproducir sonido de disparo
-      if (this.shotSnd.isPlaying) {
-        this.shotSnd.stop();  // Para el sonido si ya se está reproduciendo
+      if ((this.ship.currentWeapon == 0) || (this.ship.currentWeapon == 2))
+      {
+        if (this.shotSnd0.isPlaying) {
+          this.shotSnd0.stop(); 
+        }
+        this.shotSnd0.play();
       }
-      this.shotSnd.play();
+      else if (this.ship.currentWeapon == 1)
+      {
+        if (this.shotSnd1.isPlaying) {
+          this.shotSnd1.stop(); 
+        }
+        this.shotSnd1.play();        
+      }
 
       //Si es el Mega Rocket
       if (this.ship.currentWeapon == 1)
@@ -602,7 +626,7 @@ class MyScene extends THREE.Scene {
         var closest = colisiones[0].object;
         if (closest.userData)
         {
-          closest.userData.collision(this.ship);
+          closest.userData.collision(this.ship, this.rockSnd);
           break;
         }
       }
@@ -630,7 +654,7 @@ class MyScene extends THREE.Scene {
         var closest = colisiones[0].object;
         if (closest.userData)
         {
-          closest.userData.collision(this.shots[i]);
+          closest.userData.collision(this.shots[i], this.rockSnd);
           break;
         }
       }

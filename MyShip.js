@@ -1145,6 +1145,14 @@ class MyShip extends THREE.Object3D {
     //Volver luces a la normalidad
     if (this.ship_light0.color.getHex() != 0xF8E79F) this.colorAnim();
 
+
+    //Dead animation
+    if (this.vida <= 0)
+    {
+      this.ship.rotation.y += 0.05;
+      this.angle += 0.05; 
+    }
+
     //Drill Animation
     this.drillAnim();
   }

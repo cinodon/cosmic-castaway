@@ -269,7 +269,7 @@ class MyRock extends THREE.Object3D {
     }
   }
 
-  collision(collider)
+  collision(collider, snd)
   {
     if (collider instanceof MyShip)
     {
@@ -280,6 +280,10 @@ class MyRock extends THREE.Object3D {
         {
           collider.hit(this.dmg);
           this.breakCrystal();
+          if (snd.isPlaying) {
+            snd.stop();  // Para el sonido si ya se está reproduciendo
+          }
+          snd.play();
         }
         else
         {
@@ -302,6 +306,10 @@ class MyRock extends THREE.Object3D {
         if (this.crystal.visible == false)
         {
           this.breakCrystal();
+          if (snd.isPlaying) {
+            snd.stop();  // Para el sonido si ya se está reproduciendo
+          }
+          snd.play();
         }        
       }
       else
@@ -316,6 +324,10 @@ class MyRock extends THREE.Object3D {
         if (this.hp <= 0)
         {
           this.nodoRot.remove(this.mesh);
+          if (snd.isPlaying) {
+            snd.stop();  // Para el sonido si ya se está reproduciendo
+          }
+          snd.play();
         }
         collider.destroy();
       }

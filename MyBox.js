@@ -106,7 +106,7 @@ class MyBox extends THREE.Object3D {
     this.nodoRot.remove(this.box);
   }
 
-  collision(collider)
+  collision(collider, snd)
   {
     if (collider instanceof MyShip)
     {
