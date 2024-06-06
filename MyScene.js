@@ -195,12 +195,12 @@ class MyScene extends THREE.Scene {
 
     
     //Background
-    var textPath = ['./imgs/space-background.jpg',
-                     './imgs/space-background.jpg',
-                      './imgs/space-background.jpg',
-                      './imgs/space-background.jpg',
-                      './imgs/space-background.jpg',
-                      './imgs/space-background.jpg'];
+    var textPath = ['../imgs/space-background.jpg',
+                     '../imgs/space-background.jpg',
+                      '../imgs/space-background.jpg',
+                      '../imgs/space-background.jpg',
+                      '../imgs/space-background.jpg',
+                      '../imgs/space-background.jpg'];
     var text = new THREE.CubeTextureLoader().load(textPath);
     this.background = text;
   }
@@ -376,10 +376,7 @@ class MyScene extends THREE.Scene {
     var solarText = new THREE.TextureLoader().load('../imgs/solar-text.jpg');
     var sphG = new THREE.SphereGeometry(20);
     var sphM0 = new THREE.MeshBasicMaterial({
-      map:solarText,
-      roughness: 0.2, 
-      metalness: 0.7,
-      transmission: 0.8 
+      map:solarText
     });
     
     var sun0 = new THREE.Mesh(sphG, sphM0);
@@ -391,10 +388,7 @@ class MyScene extends THREE.Scene {
 
     var sphM1 = new THREE.MeshBasicMaterial({
       map:solarText,
-      roughness: 0.2, 
-      metalness: 0.7,
-      color: 0x5FFFEC,
-      transmission: 0.8 
+      color: 0x5FFFEC
     });
 
     var sun1 = new THREE.Mesh(sphG, sphM1);
@@ -406,10 +400,7 @@ class MyScene extends THREE.Scene {
 
     var sphM2 = new THREE.MeshBasicMaterial({
       map:solarText,
-      roughness: 0.2, 
-      metalness: 0.7,
-      color: 0xF701FF,
-      transmission: 0.8 
+      color: 0xF701FF
     });
 
     var sun2 = new THREE.Mesh(sphG, sphM2);

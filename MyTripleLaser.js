@@ -25,10 +25,10 @@ class MyTripleLaser extends THREE.Object3D {
     //Textures
     var textureLoader = new THREE.TextureLoader();
     var texture = textureLoader.load('../imgs/black_leather.jpeg');
-    var mango_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true });
+    var mango_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false});
 
     texture = textureLoader.load('../imgs/weapon-tex.jpg');
-    var culata_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true});
+    var culata_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false});
 
 
     //Creación de geometrías 

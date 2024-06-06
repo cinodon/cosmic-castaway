@@ -19,10 +19,7 @@ class MyBoxHelix extends MyBox {
     // Resto del constructor
     //Shape
     //var geom = new THREE.CapsuleGeometry(0.25, 1, 10, 20);
-    this.mat = new THREE.MeshNormalMaterial();
-    this.mat.flatShading = true;
-    this.mat.needsUpdate = true;
-    this.mat.side = THREE.DoubleSide;
+
 
 
 
@@ -47,12 +44,15 @@ class MyBoxHelix extends MyBox {
   
   createHelix() 
   {
+    var textureLoader = new THREE.TextureLoader();
+    var texture = textureLoader.load('../imgs/rusty-metal.jpg');
+    var helix_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, metalness: 0.5 });
     var helix = new THREE.Object3D();
 
     //Partes
     var cil = new THREE.CylinderGeometry(1, 1, 1);
-    var c1 = new THREE.Mesh(cil, this.mat);
-    var c2 = new THREE.Mesh(cil, this.mat);
+    var c1 = new THREE.Mesh(cil, helix_mat);
+    var c2 = new THREE.Mesh(cil, helix_mat);
     //Escalado
     c1.scale.set(0.05, 1, 0.05);
     c2.scale.set(0.1, 0.5, 0.1);
@@ -81,8 +81,8 @@ class MyBoxHelix extends MyBox {
     };
 
     var blade_g = new THREE.ExtrudeGeometry(blade_s, extrudeSettings);
-    var blade1 = new THREE.Mesh(blade_g, this.mat);
-    var blade2 = new THREE.Mesh(blade_g, this.mat);
+    var blade1 = new THREE.Mesh(blade_g, helix_mat);
+    var blade2 = new THREE.Mesh(blade_g, helix_mat);
     blade1.rotateX(Math.PI/2);
     blade1.rotateY(Math.PI/24);
     blade2.rotateX(3*Math.PI/2);

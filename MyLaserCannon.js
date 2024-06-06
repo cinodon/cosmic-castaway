@@ -11,7 +11,6 @@ class MyLaserCannon extends THREE.Object3D {
     
     this.mat = new THREE.MeshNormalMaterial();
     this.mat.flatShading = true;
-    this.mat.needsUpdate = true;
     
     var mesh = this.createLaserCanon();
 
@@ -26,7 +25,7 @@ class MyLaserCannon extends THREE.Object3D {
     //----------------------------------------
     var textureLoader = new THREE.TextureLoader();
     var texture = textureLoader.load('../imgs/black_leather.jpeg');
-    var mango_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true });
+    var mango_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false});
 
     texture = textureLoader.load('../imgs/bright-metal.jpeg');
     var part_mat = new THREE.MeshStandardMaterial({
@@ -35,12 +34,11 @@ class MyLaserCannon extends THREE.Object3D {
       metalness: 0.5,
       roughness: 0.2,
       color: 0xE09437,
-      emissive: 0xFEAE4E,   
-      needsUpdate: true   
+      emissive: 0xFEAE4E   
   });
 
     texture = textureLoader.load('../imgs/weapon-tex.jpg');
-    var culata_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true});
+    var culata_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false});
     //----------------------------------------
 
 

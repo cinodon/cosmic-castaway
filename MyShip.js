@@ -144,11 +144,7 @@ class MyShip extends THREE.Object3D {
   {
     //Luz de la nave
     var sphGS = new THREE.SphereGeometry(0.2);
-    var sphMS = new THREE.MeshBasicMaterial({
-      roughness: 0.2, 
-      metalness: 0.7,
-      transmission: 0.8 
-    });
+    var sphMS = new THREE.MeshBasicMaterial();
 
     var sphShip0 = new THREE.Mesh(sphGS, sphMS);
     var sphShip1 = new THREE.Mesh(sphGS, sphMS);
@@ -182,9 +178,9 @@ class MyShip extends THREE.Object3D {
     //Drill mat
     var textureLoader = new THREE.TextureLoader();
     var texture = textureLoader.load('../imgs/rusty-metal.jpg');
-    var drillPartMat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
+    var drillPartMat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, metalness: 0.5 });
     texture = textureLoader.load('../imgs/drill-text.jpg');
-    var drillMat = new THREE.MeshStandardMaterial( {map: texture, flatShading: false, needsUpdate: true, metalness: 1 });
+    var drillMat = new THREE.MeshStandardMaterial( {map: texture, flatShading: false, metalness: 1 });
 
     var drill = new THREE.Object3D();
     var l = 0.25;
@@ -284,9 +280,9 @@ class MyShip extends THREE.Object3D {
     var texture = textureLoader.load('../imgs/rusty-metal.jpg');
     var textB = textureLoader.load('../imgs/metal-bmap.jpg');
     var textN = textureLoader.load('../imgs/metal-nmap.jpg');
-    var rusty_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5, bumpMap:textB, bumpScale:3 });
+    var rusty_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, metalness: 0.5, bumpMap:textB, bumpScale:3 });
     texture = textureLoader.load('../imgs/red-metal.jpeg');
-    var red_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5, normalMap:textN, normalScale:(3,3) });
+    var red_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, metalness: 0.5, normalMap:textN, normalScale:(3,3) });
     
 
     //Parte trasera
@@ -398,9 +394,9 @@ class MyShip extends THREE.Object3D {
     var textB = textureLoader.load('../imgs/metal-bmap.jpg');
     var textN = textureLoader.load('../imgs/metal-nmap.jpg');
     var texture = textureLoader.load('../imgs/red-metal.jpeg');
-    var red_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5, bumpMap:textB, bumpScale:3 });
+    var red_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, metalness: 0.5, bumpMap:textB, bumpScale:3 });
     var texture = textureLoader.load('../imgs/weapon-tex.jpg');
-    var metal_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5, normalMap:textN, normalScale:(3,3) });
+    var metal_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, metalness: 0.5, normalMap:textN, normalScale:(3,3) });
 
     //Material
     var mat = new THREE.MeshStandardMaterial();
@@ -511,9 +507,9 @@ class MyShip extends THREE.Object3D {
     var textB = textureLoader.load('../imgs/metal-bmap.jpg');
     var textN = textureLoader.load('../imgs/metal-nmap.jpg');
     var texture = textureLoader.load('../imgs/black_leather.jpeg');
-    var seat_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
+    var seat_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, metalness: 0.5 });
     var texture = textureLoader.load('../imgs/rusty-metal.jpg');
-    var plate_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5, normalMap:textN, bumpMap:textB });
+    var plate_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, metalness: 0.5, normalMap:textN, bumpMap:textB });
 
 
     //Partes
@@ -578,10 +574,10 @@ class MyShip extends THREE.Object3D {
     //Textures
     var textureLoader = new THREE.TextureLoader();
     var texture = textureLoader.load('../imgs/black_leather.jpeg');
-    var mango_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true });
+    var mango_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false});
 
     texture = textureLoader.load('../imgs/weapon-tex.jpg');
-    var culata_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true});
+    var culata_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false});
 
 
     //Creación de geometrías 
@@ -678,7 +674,7 @@ class MyShip extends THREE.Object3D {
     //----------------------------------------
     var textureLoader = new THREE.TextureLoader();
     var texture = textureLoader.load('../imgs/black_leather.jpeg');
-    var mango_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true });
+    var mango_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false});
 
     texture = textureLoader.load('../imgs/bright-metal.jpeg');
     var part_mat = new THREE.MeshStandardMaterial({
@@ -688,12 +684,11 @@ class MyShip extends THREE.Object3D {
       roughness: 0.2,
       color: 0xE09437,
       emissive: 0xFEAE4E,
-      emissiveIntensity: 1,   
-      needsUpdate: true   
+      emissiveIntensity: 1  
   });
 
     texture = textureLoader.load('../imgs/weapon-tex.jpg');
-    var culata_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true});
+    var culata_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false});
     //----------------------------------------
 
     //Creación de geometrías 
@@ -784,7 +779,7 @@ class MyShip extends THREE.Object3D {
     //----------------------------------------
     var textureLoader = new THREE.TextureLoader();
     var texture = textureLoader.load('../imgs/black_leather.jpeg');
-    var mango_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true });
+    var mango_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false});
 
     texture = textureLoader.load('../imgs/bright-metal.jpeg');
     var part_mat = new THREE.MeshStandardMaterial({
@@ -794,12 +789,11 @@ class MyShip extends THREE.Object3D {
       roughness: 0.2,
       color: 0x4CA6D1,
       emissive: 0xABFFF5,
-      emissiveIntensity: 1,   
-      needsUpdate: true   
+      emissiveIntensity: 1  
   });
 
     texture = textureLoader.load('../imgs/weapon-tex.jpg');
-    var culata_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true});
+    var culata_mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false});
     //----------------------------------------
 
 

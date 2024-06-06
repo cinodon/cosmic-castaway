@@ -59,7 +59,7 @@ class MyRock extends THREE.Object3D {
       }    
     } 
 
-    this.mat = new THREE.MeshStandardMaterial(textSettings);
+    this.mat = new THREE.MeshPhysicalMaterial(textSettings);
     this.mesh = this.createRock();
     this.crystal = this.createCrystal();
     this.crystal.visible = false;

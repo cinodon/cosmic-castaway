@@ -23,12 +23,8 @@ class MyBox extends THREE.Object3D {
     //Shape
     var textureLoader = new THREE.TextureLoader();
     var texture = textureLoader.load('../imgs/rusty-metal.jpg');
-    this.mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, needsUpdate: true, metalness: 0.5 });
-    /*this.mat = new THREE.MeshStandardMaterial();
-    this.mat.flatShading = true;
-    this.mat.needsUpdate = true;
-    this.mat.side = THREE.DoubleSide;
-    this.mat.color = 0x3D3D3D;*/
+    this.mat = new THREE.MeshStandardMaterial({ map: texture, flatShading: false, metalness: 0.5 });
+
 
 
     this.box = this.createBox(); //;this.createBox();
