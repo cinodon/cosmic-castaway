@@ -2,6 +2,7 @@ import { color } from '../libs/dat.gui.module.js';
 import * as THREE from '../libs/three.module.js'
 import { CSG } from '../libs/CSG-v2.js'
 import { MyCrystal } from './MyCrystal.js';
+import { MyShip } from './MyShip.js';
  
 class MyRock extends THREE.Object3D {
   constructor(gui,titleGui, isCrystal, geomTubo, angle, pos) {
@@ -12,7 +13,10 @@ class MyRock extends THREE.Object3D {
     this.createGUI(gui,titleGui);
 
     //Vida cristal
-    this.hp = 1;
+    if (isCrystal) this.hp = 1; else this.hp = 3;
+    this.anim_t = 0;
+    this.anim_end = 10;
+    this.hit = false;
 
     //Tubo - Obtener información del tubo
     this.tubo = geomTubo;
@@ -265,26 +269,56 @@ class MyRock extends THREE.Object3D {
     }
   }
 
-  collision(ship)
+  collision(collider)
   {
-    if (this.isCrystal == true)
+    if (collider instanceof MyShip)
     {
-      //No es mineral
-      if (this.crystal.visible == false)
+      if (this.isCrystal == true)
       {
-        ship.hit(this.dmg);
-        this.breakCrystal();
+        //No es mineral
+        if (this.crystal.visible == false)
+        {
+          collider.hit(this.dmg);
+          this.breakCrystal();
+        }
+        else
+        {
+          collider.getCrystal();
+          this.nodoRot.remove(this.crystal);
+        }
       }
       else
       {
-        ship.getCrystal();
-        this.nodoRot.remove(this.crystal);
+        //Es una roca y no está destruida
+        if (this.hp > 0) collider.hit(this.dmg);
+        
       }
     }
     else
     {
-      //Es una roca
-      ship.hit(this.dmg);
+      //Es un disparo
+      if (this.isCrystal == true)
+      {
+        if (this.crystal.visible == false)
+        {
+          this.breakCrystal();
+        }        
+      }
+      else
+      {
+        //Destruir el disparo y reducir la vida
+        this.hp -= collider.dmg;
+        var color = new THREE.Color(0xE4080A);
+        this.mat.color = color;
+        this.hit = true;
+        
+        //Si  
+        if (this.hp <= 0)
+        {
+          this.nodoRot.remove(this.mesh);
+        }
+        collider.destroy();
+      }
     }
   }
 
@@ -351,6 +385,19 @@ class MyRock extends THREE.Object3D {
     this.position.set (this.guiControls.posX,this.guiControls.posY,this.guiControls.posZ);
     this.rotation.set (this.guiControls.rotX,this.guiControls.rotY,this.guiControls.rotZ);
     this.scale.set (this.guiControls.sizeX,this.guiControls.sizeY,this.guiControls.sizeZ);
+
+    //Disparado
+    if (this.hit)
+    {
+      this.anim_t++;
+      if (this.anim_t  >= this.anim_end )
+      {
+        this.anim_t = 0;
+        var color = new THREE.Color(0xFFFFFF);
+        this.mat.color = color;
+        this.hit = false;
+      }
+    }
   }
 }
 

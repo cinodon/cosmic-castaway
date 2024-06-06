@@ -1,4 +1,5 @@
 import * as THREE from '../libs/three.module.js'
+import { MyShip } from './MyShip.js';
  
 class MyGear extends THREE.Object3D {
   constructor(gui,titleGui, geomTubo, angle, pos) {
@@ -106,10 +107,13 @@ class MyGear extends THREE.Object3D {
     this.add(this.nodoPosTubo);
   }
   
-  collision(ship)
+  collision(collider)
   {
-    ship.heal();
-    this.remove(this.nodoPosTubo);
+    if (collider instanceof MyShip)
+    {
+      collider.heal();
+      this.remove(this.nodoPosTubo);
+    }
   }
 
   createGUI (gui,titleGui) {

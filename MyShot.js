@@ -3,7 +3,7 @@ import * as THREE from '../libs/three.module.js'
 import { CSG } from '../libs/CSG-v2.js'
 
 class MyShot extends THREE.Object3D {
-  constructor(gui,titleGui, geomTubo, angle, pos, spd) {
+  constructor(gui,titleGui, geomTubo, angle, pos, spd, ship) {
     super();
     
     // Se crea la parte de la interfaz que corresponde a la caja
@@ -11,7 +11,22 @@ class MyShot extends THREE.Object3D {
     this.createGUI(gui,titleGui);
     
     //Propiedades
-    //this.dmg = 5;
+    this.ship = ship;
+    switch(this.ship.currentWeapon)
+    {
+      case 0:
+        this.dmg = 1;
+      break;
+
+      case 1:
+        this.dmg = 2.5;
+      break;
+
+      case 2:
+        this.dmg = 0.75;
+      break;
+    }
+
 
     //Tubo - Obtener información del tubo
     this.tubo = geomTubo;
@@ -24,6 +39,7 @@ class MyShot extends THREE.Object3D {
     this.t = pos; //Posición longitudinal - 0 origen
     this.totalD = pos;
     this.end = pos + 0.1;
+    this.destroyed = false;
     var timeTotal = 25; //Tiempo total del circuito en segundos
     this.spd = spd*2; //Velocidad
     //---------------------------------------------------------
@@ -119,11 +135,17 @@ class MyShot extends THREE.Object3D {
     this.nodoPosTubo.lookAt (posTmp);  
   }
 
+  destroy()
+  {
+    this.totalD = this.end;
+    this.destroyed = true;
+  }
+
   update () {
     // Con independencia de cómo se escriban las 3 siguientes líneas, el orden en el que se aplican las transformaciones es:
     var time = this.clock.getDelta(); 
     this.t += this.spd * time;
-    this.totalD += this.spd * time;
+    if (this.destroyed == false) this.totalD += this.spd * time;
     if (this.t >= 1) 
     {
       //Destruir bala?

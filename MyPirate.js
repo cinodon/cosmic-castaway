@@ -1,8 +1,8 @@
 import * as THREE from '../libs/three.module.js'
 import { CSG } from '../libs/CSG-v2.js' 
-import { MyShip } from './MyShip.js';
 
-class MyPirate extends MyShip {
+
+class MyPirate extends THREE.Object3D {
   constructor(gui,titleGui) {
     super(gui, titleGui, );
     

@@ -164,9 +164,21 @@ class MyScene extends THREE.Scene {
     this.currentCam = 1;
 
     this.createCamera();
-
     //Creacion de la cámara la del player
     this.createPlayerCamera();
+
+    this.listener = new THREE.AudioListener();
+    this.playerCam.add(this.listener);
+    this.audioLoader = new THREE.AudioLoader();
+    this.shotSnd = new THREE.Audio(this.listener);
+
+     
+    this.audioLoader.load("./sounds/shot.mp3", (buffer) => {
+      this.shotSnd.setBuffer(buffer);
+      this.shotSnd.setLoop(false); 
+      this.shotSnd.setVolume(0.5);
+  });
+
     
     //Background
     var textPath = ['./imgs/space-background.jpg',
@@ -315,7 +327,7 @@ class MyScene extends THREE.Scene {
       ambientIntensity : 0.5,   
       axisOnOff : true
     }
-
+/*
     // Se crea una sección para los controles de esta clase
     var folder = gui.addFolder ('Luz y Ejes');
     
@@ -333,7 +345,7 @@ class MyScene extends THREE.Scene {
     folder.add (this.guiControls, 'axisOnOff')
       .name ('Mostrar ejes : ')
       .onChange ( (value) => this.setAxisVisible (value) );
-    
+    */
     return gui;
   }
   
@@ -498,10 +510,36 @@ class MyScene extends THREE.Scene {
     if (x == 3)
     {
       //Creamos el objeto disparo
-      var shot = new MyShot(this.gui, "Disparo "+ this.ship.t, this.tube.geometry, this.ship.angle, this.ship.t, this.ship.spd);
+      var shot = new MyShot(this.gui, "Disparo "+ this.ship.t, this.tube.geometry, this.ship.angle, this.ship.t, this.ship.spd, this.ship);
+      
+      // Reproducir sonido de disparo
+      if (this.shotSnd.isPlaying) {
+        this.shotSnd.stop();  // Para el sonido si ya se está reproduciendo
+      }
+      this.shotSnd.play();
+
+      //Si es el Mega Rocket
+      if (this.ship.currentWeapon == 1)
+      {
+        shot.shot.scale.set(2, 2, 4);
+      }
 
       this.shots.push(shot);
       this.add(shot);
+
+      //Si es triple laser creamos 2 más
+      if (this.ship.currentWeapon == 2)  
+      {
+        var shot = new MyShot(this.gui, "Disparo 2"+ this.ship.t, this.tube.geometry, this.ship.angle, this.ship.t, this.ship.spd, this.ship);
+        shot.shot.position.x = shot.shot.position.x - 1;
+        this.shots.push(shot);
+        this.add(shot);
+        
+        var shot = new MyShot(this.gui, "Disparo 3"+ this.ship.t, this.tube.geometry, this.ship.angle, this.ship.t, this.ship.spd, this.ship);
+        shot.shot.position.x = shot.shot.position.x + 1;
+        this.shots.push(shot);
+        this.add(shot);    
+      }
     }
   }
 
@@ -574,7 +612,29 @@ class MyScene extends THREE.Scene {
 
   shotCollision()
   {
+    var pos = new THREE.Vector3();
+    var dir = new THREE.Vector3();
+    this.collisionRay.set(pos, dir);
     
+    for (let i = 0; i < this.shots.length; i++)
+    {
+      this.shots[i].shot.getWorldPosition(pos);
+      this.shots[i].shot.getWorldDirection(dir);
+      
+      //Establecer rayo
+      this.collisionRay.set(pos, dir);
+
+      var colisiones = this.collisionRay.intersectObjects(this.collisions, true);
+      if (colisiones.length > 0)
+      {
+        var closest = colisiones[0].object;
+        if (closest.userData)
+        {
+          closest.userData.collision(this.shots[i]);
+          break;
+        }
+      }
+    }
   }
 
   update () {
@@ -651,6 +711,12 @@ class MyScene extends THREE.Scene {
     document.getElementById("Mineral").innerHTML = "<h2>"+"Mineral: "+this.ship.mineral + "</h2>"
     let health = document.getElementById("health");
     health.value = (this.ship.vida/this.ship.VIDA_MAX)*100;
+    
+    //Game over
+    if (this.ship.vida <= 0)
+    {
+      window.location.href = '../game_over.html';
+    }  
 
     // Este método debe ser llamado cada vez que queramos visualizar la escena de nuevo.
     // Literalmente le decimos al navegador: "La próxima vez que haya que refrescar la pantalla, llama al método que te indico".

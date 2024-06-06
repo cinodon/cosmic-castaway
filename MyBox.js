@@ -1,6 +1,7 @@
 import { color } from '../libs/dat.gui.module.js';
 import * as THREE from '../libs/three.module.js'
 import { CSG } from '../libs/CSG-v2.js'
+import { MyShip } from './MyShip.js';
 
 class MyBox extends THREE.Object3D {
   constructor(gui,titleGui, geomTubo, angle, pos) {
@@ -105,10 +106,19 @@ class MyBox extends THREE.Object3D {
     this.nodoRot.remove(this.box);
   }
 
-  collision(ship)
+  collision(collider)
   {
-    this.shot(ship);
-    ship.hit(this.dmg);
+    if (collider instanceof MyShip)
+    {
+      this.shot(collider);
+      collider.hit(this.dmg);
+    }
+    else
+    {
+      //Colisión con disparo
+      this.shot(collider.ship);
+      collider.destroy();
+    }
   }
 
   createGUI (gui,titleGui) {
