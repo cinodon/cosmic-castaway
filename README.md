@@ -1,7 +1,7 @@
 # Cosmic Castaway
 
 **Cosmic Castaway** is a 3D web game developed with **Three.js** as part of a university course in **Computer Graphics**. The game immerses players in a futuristic space adventure where they pilot a space collector on a tubular circuit, collecting valuable resources and avoiding or destroying obstacles.
-![Manual Section Screenshot](cosmic-castaway/man_pag.jpg)
+![Manual Section Screenshot](man_pag.jpg)
 
 ## Gameplay Overview
 In *Cosmic Castaway*, players navigate a space collector around a tubular track to:
